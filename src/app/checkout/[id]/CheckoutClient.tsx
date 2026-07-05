@@ -89,7 +89,7 @@ export default function CheckoutClient({ service }: { service: any }) {
   };
 
   return (
-    <div className="flex-1 py-12 px-6 bg-red-50/10">
+    <div className="flex-1 py-8 md:py-12 px-4 sm:px-6 bg-red-50/10">
       <AnimatePresence mode="wait">
         
         {/* CHECKOUT STATE */}
@@ -106,11 +106,11 @@ export default function CheckoutClient({ service }: { service: any }) {
               <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Katalog
             </Link>
             
-            <div className="bg-white p-8 md:p-10 rounded-3xl border border-red-100 shadow-xl shadow-red-900/5">
+            <div className="bg-white p-5 sm:p-8 md:p-10 rounded-3xl border border-red-100 shadow-xl shadow-red-900/5">
               
               {/* Header Layanan */}
               <div className="flex flex-col md:flex-row items-start md:items-center gap-5 mb-8 pb-8 border-b border-red-100">
-                <div className="h-20 w-28 flex items-center justify-center p-3 bg-white border border-red-100 rounded-2xl shadow-sm">
+                <div className="h-16 w-24 sm:h-20 sm:w-28 flex items-center justify-center p-2.5 sm:p-3 bg-white border border-red-100 rounded-2xl shadow-sm">
                    <img 
                     src={service.logoUrl} 
                     alt={service.name} 
@@ -118,22 +118,22 @@ export default function CheckoutClient({ service }: { service: any }) {
                   />
                 </div>
                 <div>
-                  <h2 className="text-2xl font-bold text-red-950 tracking-tight mb-1">{service.name}</h2>
+                  <h2 className="text-xl sm:text-2xl font-bold text-red-950 tracking-tight mb-1">{service.name}</h2>
                   <div className="flex items-center gap-2">
-                    <p className="text-red-600 font-bold text-xl">{formatRupiah(service.sharedPrice)}</p>
-                    <span className="px-2 py-0.5 bg-red-50 text-red-700 font-semibold text-xs rounded-full">Per Bulan</span>
+                    <p className="text-red-600 font-bold text-lg sm:text-xl">{formatRupiah(service.sharedPrice)}</p>
+                    <span className="px-2 py-0.5 bg-red-50 text-red-700 font-semibold text-[10px] sm:text-xs rounded-full">Per Bulan</span>
                   </div>
                 </div>
               </div>
 
-              {/* KHUSUS NETFLIX: SISTEM PILIHAN GRUP */}
+              {/* KHUSUS NETFLIX: PILIHAN GRUP */}
               {isNetflix && (
                 <div className="mb-8 pb-8 border-b border-red-100">
-                  <h3 className="text-base font-bold text-red-950 mb-4 flex items-center gap-2">
+                  <h3 className="text-sm sm:text-base font-bold text-red-950 mb-4">
                     Pilih Grup Patungan Aktif
                   </h3>
                   
-                  <div className="grid md:grid-cols-3 gap-4 mb-6">
+                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
                     {MOCK_NETFLIX_GROUPS.map((group) => {
                       const isFull = group.status === "full";
                       const isChosen = selectedGroup?.id === group.id;
@@ -142,7 +142,7 @@ export default function CheckoutClient({ service }: { service: any }) {
                         <div
                           key={group.id}
                           onClick={() => !isFull && setSelectedGroup(group)}
-                          className={`p-4 rounded-2xl border transition-all ${
+                          className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
                             isFull 
                               ? "bg-red-50/20 border-red-100 opacity-60 cursor-not-allowed" 
                               : isChosen
@@ -150,9 +150,9 @@ export default function CheckoutClient({ service }: { service: any }) {
                                 : "bg-white border-red-100 hover:border-red-300 cursor-pointer"
                           }`}
                         >
-                          <div className="flex justify-between items-center mb-3">
-                            <span className="text-sm font-bold text-red-950">{group.name}</span>
-                            <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${
+                          <div className="flex justify-between items-center mb-2.5">
+                            <span className="text-xs sm:text-sm font-bold text-red-950">{group.name}</span>
+                            <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold ${
                               isFull 
                                 ? "bg-red-100 text-red-800" 
                                 : group.status === "hampir-penuh"
@@ -163,19 +163,19 @@ export default function CheckoutClient({ service }: { service: any }) {
                             </span>
                           </div>
 
-                          {/* Visualisasi Slot Bulatan */}
-                          <div className="flex gap-2">
+                          {/* Visualisasi Slot */}
+                          <div className="flex gap-1.5">
                             {group.slots.map((slot, i) => (
                               <div 
                                 key={i} 
-                                className={`w-6 h-6 rounded-full flex items-center justify-center border text-[10px] font-bold ${
+                                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border text-[8px] sm:text-[10px] font-bold ${
                                   slot.occupied 
                                     ? "bg-red-600 border-red-600 text-white" 
                                     : "border-dashed border-red-300 text-red-300 bg-white"
                                 }`}
                                 title={slot.name}
                               >
-                                {slot.occupied ? <User size={10} /> : <UserPlus size={10} />}
+                                {slot.occupied ? <User size={8} /> : <UserPlus size={8} />}
                               </div>
                             ))}
                           </div>
@@ -184,24 +184,24 @@ export default function CheckoutClient({ service }: { service: any }) {
                     })}
                   </div>
 
-                  {/* Preview Detail Slot Grup yang Dipilih */}
+                  {/* Detail Slot */}
                   {selectedGroup && (
-                    <div className="bg-red-50/50 p-5 rounded-2xl border border-red-100">
-                      <p className="text-xs font-bold text-red-800 uppercase tracking-wider mb-3">Detail Anggota {selectedGroup.name}</p>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                    <div className="bg-red-50/50 p-4 sm:p-5 rounded-2xl border border-red-100">
+                      <p className="text-[10px] sm:text-xs font-bold text-red-800 uppercase tracking-wider mb-3">Detail Anggota {selectedGroup.name}</p>
+                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
                         {selectedGroup.slots.map((slot: any, i: number) => {
                           const isOccupied = slot.occupied;
                           const showPreviewName = !isOccupied && name;
                           
                           return (
-                            <div key={i} className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl border border-red-100">
-                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                            <div key={i} className="flex items-center gap-2 bg-white px-2.5 py-2 rounded-xl border border-red-100 min-w-0">
+                              <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
                                 isOccupied || showPreviewName ? "bg-red-600 text-white" : "bg-red-50 text-red-300"
                               }`}>
-                                <User size={14} />
+                                <User size={12} />
                               </div>
-                              <div className="min-w-0">
-                                <p className="text-xs text-red-400 font-semibold">Slot {i+1}</p>
+                              <div className="min-w-0 flex-1">
+                                <p className="text-[9px] sm:text-[10px] text-red-400 font-semibold">Slot {i+1}</p>
                                 <p className="text-xs font-bold text-red-950 truncate">
                                   {isOccupied ? slot.name : showPreviewName ? `${name} (Anda)` : "Kosong"}
                                 </p>
@@ -216,9 +216,9 @@ export default function CheckoutClient({ service }: { service: any }) {
               )}
 
               {/* Form Checkout */}
-              <div className="space-y-6">
+              <div className="space-y-5">
                 <div>
-                  <label className="block text-sm font-semibold text-red-950 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-red-950 mb-2">
                     Nama Panggilan Anda
                   </label>
                   <input 
@@ -226,12 +226,12 @@ export default function CheckoutClient({ service }: { service: any }) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Misal: Budi Santoso"
-                    className="w-full px-5 py-3.5 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-base"
+                    className="w-full px-4 py-3 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-sm sm:text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-semibold text-red-950 mb-2">
+                  <label className="block text-xs sm:text-sm font-semibold text-red-950 mb-2">
                     Nomor WhatsApp Aktif
                   </label>
                   <input 
@@ -239,10 +239,10 @@ export default function CheckoutClient({ service }: { service: any }) {
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
                     placeholder="08123456789"
-                    className="w-full px-5 py-3.5 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-base"
+                    className="w-full px-4 py-3 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-sm sm:text-base"
                   />
-                  <p className="text-xs text-red-700 mt-2 flex items-center gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
-                    <AlertCircle size={14} className="text-red-600 flex-shrink-0" /> Akun premium akan dikirim ke nomor ini via WA.
+                  <p className="text-[10px] sm:text-xs text-red-700 mt-2 flex items-center gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
+                    <AlertCircle size={12} className="text-red-600 flex-shrink-0" /> Akun premium akan dikirim ke nomor ini via WA.
                   </p>
                 </div>
 
@@ -252,7 +252,7 @@ export default function CheckoutClient({ service }: { service: any }) {
                       <CheckCircle2 size={12} className={`text-white transition-opacity ${agreed ? 'opacity-100' : 'opacity-0'}`} strokeWidth={3} />
                     </div>
                   </div>
-                  <div className="text-sm text-red-900 leading-relaxed font-semibold">
+                  <div className="text-xs sm:text-sm text-red-900 leading-relaxed font-semibold">
                     Saya menyetujui Syarat & Ketentuan. <strong className="text-red-600 block mt-0.5">Dilarang mengubah profil atau password orang lain di dalam akun.</strong>
                   </div>
                 </div>
@@ -260,13 +260,13 @@ export default function CheckoutClient({ service }: { service: any }) {
                 <button 
                   disabled={!name || !whatsapp || !agreed || isLoading}
                   onClick={handleCheckout}
-                  className="relative w-full py-4 px-6 bg-red-600 hover:bg-red-700 disabled:bg-red-50 disabled:text-red-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all active:scale-[0.98] mt-6 flex justify-center items-center gap-2 overflow-hidden group shadow-md"
+                  className="relative w-full py-3.5 px-6 bg-red-600 hover:bg-red-700 disabled:bg-red-50 disabled:text-red-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-base sm:text-lg transition-all active:scale-[0.98] mt-6 flex justify-center items-center gap-2 overflow-hidden group shadow-md"
                 >
                   {isLoading ? (
-                    <Loader2 size={20} className="animate-spin" />
+                    <Loader2 size={18} className="animate-spin" />
                   ) : (
                     <>
-                      <QrCode size={20} className="group-hover:scale-105 transition-transform" /> Bayar Sekarang
+                      <QrCode size={18} className="group-hover:scale-105 transition-transform" /> Bayar Sekarang
                     </>
                   )}
                 </button>
@@ -284,36 +284,36 @@ export default function CheckoutClient({ service }: { service: any }) {
             exit={{ opacity: 0, scale: 0.98 }}
             className="max-w-md mx-auto"
           >
-            <div className="bg-white p-10 rounded-3xl border border-red-100 shadow-xl text-center relative overflow-hidden">
+            <div className="bg-white p-8 sm:p-10 rounded-3xl border border-red-100 shadow-xl text-center relative overflow-hidden">
               <div className="absolute top-0 left-0 w-full h-1 bg-red-600" />
               
-              <h2 className="text-2xl font-bold mb-2 text-red-950">Selesaikan Pembayaran</h2>
-              <p className="text-red-700 text-sm mb-8 font-semibold">Buka M-Banking atau E-Wallet Anda lalu scan kode QR di bawah ini.</p>
+              <h2 className="text-xl sm:text-2xl font-bold mb-1.5 text-red-950">Selesaikan Pembayaran</h2>
+              <p className="text-red-700 text-xs sm:text-sm mb-6 sm:mb-8 font-semibold">Scan kode QR di bawah ini.</p>
               
-              <div className="bg-white p-4 rounded-2xl inline-block mb-8 border border-red-100 shadow-sm">
-                <div className="w-48 h-48 border border-red-50 rounded-xl flex items-center justify-center bg-white">
+              <div className="bg-white p-3 sm:p-4 rounded-2xl inline-block mb-6 sm:mb-8 border border-red-100 shadow-sm">
+                <div className="w-40 h-40 sm:w-48 sm:h-48 border border-red-50 rounded-xl flex items-center justify-center bg-white">
                   {isLoading ? (
-                    <Loader2 size={36} className="text-red-300 animate-spin" />
+                    <Loader2 size={32} className="text-red-300 animate-spin" />
                   ) : (
-                    <QrCode size={180} className="text-red-950" strokeWidth={1.2} />
+                    <QrCode size={160} className="text-red-950" strokeWidth={1.2} />
                   )}
                 </div>
               </div>
               
-              <div className="mb-8">
-                <p className="text-xs text-red-700 font-bold mb-1 uppercase tracking-wider">Total Tagihan</p>
-                <p className="text-3xl font-bold text-red-600">{formatRupiah(service.sharedPrice)}</p>
+              <div className="mb-6 sm:mb-8">
+                <p className="text-[10px] sm:text-xs text-red-700 font-bold mb-1 uppercase tracking-wider">Total Tagihan</p>
+                <p className="text-2xl sm:text-3xl font-bold text-red-600">{formatRupiah(service.sharedPrice)}</p>
               </div>
 
-              <div className="flex items-center justify-center gap-2 text-xs font-bold text-red-700 bg-red-50 py-3 px-6 rounded-full mb-8 w-max mx-auto border border-red-100">
-                <AlertCircle size={16} className="text-red-600" />
-                Batas Waktu: <span className="text-red-600 text-sm ml-1 font-bold">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
+              <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-5 rounded-full mb-6 sm:mb-8 w-max mx-auto border border-red-100">
+                <AlertCircle size={14} className="text-red-600" />
+                Batas Waktu: <span className="text-red-600 ml-1 font-bold">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
               </div>
 
               <button 
                 onClick={handlePayment}
                 disabled={isLoading}
-                className="w-full py-4 text-sm font-bold border border-red-100 text-red-950 hover:bg-red-50 rounded-xl transition-all active:scale-95 disabled:opacity-50"
+                className="w-full py-3.5 text-xs sm:text-sm font-bold border border-red-100 text-red-950 hover:bg-red-50 rounded-xl transition-all active:scale-95 disabled:opacity-50"
               >
                 {isLoading ? "Memverifikasi..." : "[Simulasi] Konfirmasi Pembayaran"}
               </button>
@@ -329,34 +329,29 @@ export default function CheckoutClient({ service }: { service: any }) {
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-xl mx-auto"
           >
-            <div className="bg-white p-10 rounded-3xl border border-red-100 shadow-xl text-center">
+            <div className="bg-white p-8 sm:p-10 rounded-3xl border border-red-100 shadow-xl text-center">
               <motion.div 
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
                 transition={{ type: "spring", bounce: 0.4 }}
-                className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-md"
+                className="w-16 h-16 sm:w-20 sm:h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-md"
               >
-                <CheckCircle2 size={36} className="text-white" strokeWidth={2.5} />
+                <CheckCircle2 size={28} className="text-white" strokeWidth={2.5} />
               </motion.div>
               
-              <h2 className="text-3xl font-bold mb-3 text-red-950 tracking-tight">Pembayaran Sukses!</h2>
-              <p className="text-red-800 text-base mb-8 font-semibold leading-relaxed">
+              <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-red-950 tracking-tight">Pembayaran Sukses!</h2>
+              <p className="text-red-800 text-sm sm:text-base mb-6 sm:mb-8 font-semibold leading-relaxed">
                 Anda telah resmi bergabung ke grup patungan <br/>
-                <span className="inline-block mt-1.5 px-3 py-1 bg-red-50 border border-red-100 text-red-700 rounded-lg text-sm">
-                  {selectedGroup ? selectedGroup.name : service.name}
-                </span>
+                <span className="inline-block mt-1.5 px-3 py-1 bg-red-50 border border-red-100 text-red-700 rounded-lg text-xs sm:text-sm">{selectedGroup ? selectedGroup.name : service.name}</span>
               </p>
 
-              <div className="bg-white p-6 rounded-2xl text-left border border-red-100 mb-8">
-                <div className="flex justify-between text-sm mb-4">
+              <div className="bg-white p-5 sm:p-6 rounded-2xl text-left border border-red-100 mb-6 sm:mb-8">
+                <div className="flex justify-between text-xs sm:text-sm mb-3">
                   <span className="font-bold text-red-950">Status Antrean Grup</span>
-                  <span className="text-red-600 font-bold text-base">
-                    {selectedGroup ? selectedGroup.filled + 1 : service.filledSlots + 1} 
-                    <span className="text-red-400 text-xs"> / {selectedGroup ? selectedGroup.total : service.totalSlots} Orang</span>
-                  </span>
+                  <span className="text-red-600 font-bold text-sm sm:text-base">{selectedGroup ? selectedGroup.filled + 1 : service.filledSlots + 1} <span className="text-red-400 text-[10px] sm:text-xs"> / {selectedGroup ? selectedGroup.total : service.totalSlots} Orang</span></span>
                 </div>
                 
-                <div className="w-full bg-red-50 rounded-full h-4 overflow-hidden mb-6 border border-red-100 p-0.5">
+                <div className="w-full bg-red-50 rounded-full h-3.5 overflow-hidden mb-5 sm:mb-6 border border-red-100 p-0.5">
                   <motion.div 
                     initial={{ width: `${(selectedGroup ? selectedGroup.filled : service.filledSlots) / (selectedGroup ? selectedGroup.total : service.totalSlots) * 100}%` }}
                     animate={{ width: `${((selectedGroup ? selectedGroup.filled : service.filledSlots) + 1) / (selectedGroup ? selectedGroup.total : service.totalSlots) * 100}%` }}
@@ -369,17 +364,15 @@ export default function CheckoutClient({ service }: { service: any }) {
                 
                 <div className="flex items-start gap-3 bg-red-50/50 p-4 rounded-xl border border-red-50">
                   <div className="w-2 h-2 bg-red-600 rounded-full mt-1.5 animate-pulse flex-shrink-0"></div>
-                  <p className="text-sm text-red-900 leading-relaxed font-semibold">
-                    Menunggu <strong className="text-red-600">
-                      {(selectedGroup ? selectedGroup.total : service.totalSlots) - ((selectedGroup ? selectedGroup.filled : service.filledSlots) + 1)} orang lagi
-                    </strong> bergabung. Jika kuota penuh, email & password akan dikirim otomatis ke WhatsApp <span className="text-red-600 underline decoration-red-300 underline-offset-4">{whatsapp}</span>.
+                  <p className="text-xs text-red-900 leading-relaxed font-semibold">
+                    Menunggu <strong className="text-red-600">{(selectedGroup ? selectedGroup.total : service.totalSlots) - ((selectedGroup ? selectedGroup.filled : service.filledSlots) + 1)} orang lagi</strong> bergabung. Kredensial akun dikirim otomatis ke WA <span className="text-red-600 underline decoration-red-300 underline-offset-4">{whatsapp}</span>.
                   </p>
                 </div>
               </div>
 
               <Link 
                 href="/"
-                className="block w-full py-4 px-6 bg-red-950 text-white hover:bg-red-900 rounded-xl font-bold text-base transition-all active:scale-[0.98] text-center"
+                className="block w-full py-3.5 px-6 bg-red-950 text-white hover:bg-red-900 rounded-xl font-bold text-sm sm:text-base transition-all active:scale-[0.98] text-center"
               >
                 Kembali ke Beranda
               </Link>
