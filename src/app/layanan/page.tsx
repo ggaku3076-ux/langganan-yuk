@@ -12,18 +12,19 @@ export default function LayananPage() {
         <p className="text-red-800 font-medium text-sm sm:text-base max-w-2xl mx-auto">Semua layanan premium yang tersedia untuk patungan. Pilih sesuai kebutuhan Anda!</p>
       </div>
       
-      {/* 2 columns on mobile instead of 1 for a cleaner visual layout */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
         {services.map((service, index) => (
           <motion.div
             key={service.id}
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.05, duration: 0.35 }}
+            transition={{ delay: index * 0.03, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+            whileHover={{ y: -6, scale: 1.015 }}
+            whileTap={{ scale: 0.985 }}
           >
             <Link 
               href={`/checkout/${service.id}`}
-              className="group block bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:shadow-lg hover:-translate-y-1 relative overflow-hidden"
+              className="group block bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-shadow duration-200 hover:shadow-lg relative overflow-hidden h-full"
             >
               <div className="h-16 sm:h-20 flex items-center justify-center mb-4 sm:mb-6 w-full p-1 sm:p-2">
                 <img 

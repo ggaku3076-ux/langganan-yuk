@@ -76,17 +76,17 @@ export default function Navbar() {
 
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Menu (Smooth Animation) */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: "auto", opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.2 }}
+              transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
               className="overflow-hidden md:hidden border-t border-red-50"
             >
-              <div className="px-6 py-4 flex flex-col gap-4 bg-white rounded-b-2xl">
+              <div className="px-6 py-4 flex flex-col gap-3 bg-white rounded-b-2xl">
                 {links.map((link) => (
                   <Link 
                     key={link.path} 
