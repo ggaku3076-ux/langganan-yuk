@@ -1,13 +1,13 @@
 "use client";
 
 import Link from "next/link";
-import { ShieldCheck, Zap, Users, ArrowRight } from "lucide-react";
+import { ShieldCheck, Zap, Users, ArrowRight, HelpCircle, HeartHandshake, CheckCircle2 } from "lucide-react";
 import { services, formatRupiah } from "@/data/services";
 import { motion } from "framer-motion";
 
 export default function Home() {
   return (
-    <div className="w-full">
+    <div className="w-full flex flex-col">
       {/* Hero Section */}
       <section className="max-w-6xl mx-auto px-6 py-20 text-center relative overflow-hidden">
         <motion.h1 
@@ -98,6 +98,128 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* SEO & CONTENT SECTION */}
+      <section className="py-20 bg-white border-t border-red-50">
+        <div className="max-w-4xl mx-auto px-6">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl font-bold text-red-950 mb-4 tracking-tight">Solusi Patungan Langganan Premium Terbaik di Indonesia</h2>
+            <p className="text-red-800 font-semibold text-sm max-w-2xl mx-auto leading-relaxed">
+              Mulai hemat pengeluaran bulanan Anda untuk kebutuhan hiburan dan produktivitas dengan sistem patungan otomatis yang aman, murah, dan 100% bergaransi.
+            </p>
+          </div>
+
+          <div className="space-y-12">
+            {/* SEO Article 1 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="p-3 bg-red-50 rounded-2xl border border-red-100 text-red-600 flex-shrink-0">
+                <HelpCircle size={28} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-red-950 mb-3">Apa Itu Patungan Akun Premium di Langganan Yuk?</h3>
+                <p className="text-red-900/80 font-medium text-sm leading-relaxed mb-3">
+                  Banyak dari kita yang membutuhkan akun premium untuk hiburan keluarga seperti <strong>Netflix Premium</strong> atau alat bantu kecerdasan buatan (AI) seperti <strong>Claude Pro</strong> dan <strong>ChatGPT Plus (GPT-5)</strong>. Namun, biaya berlangganan bulanan mandiri seringkali dirasa terlalu mahal bagi pelajar, mahasiswa, dan pekerja lepas (*freelancer*).
+                </p>
+                <p className="text-red-900/80 font-medium text-sm leading-relaxed">
+                  <strong>Langganan Yuk</strong> hadir sebagai platform SaaS perantara terpercaya. Kami memfasilitasi pembagian kuota grup secara otomatis (matchmaking) sehingga Anda bisa membagi biaya langganan secara adil. Anda hanya perlu membayar sepertiga atau seperempat dari harga asli untuk menikmati fasilitas premium yang sama!
+                </p>
+              </div>
+            </div>
+
+            {/* SEO Article 2 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="p-3 bg-red-50 rounded-2xl border border-red-100 text-red-600 flex-shrink-0">
+                <ShieldCheck size={28} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-red-950 mb-3">Layanan Patungan Netflix Murah, Spotify, dan AI yang 100% Legal</h3>
+                <p className="text-red-900/80 font-medium text-sm leading-relaxed mb-3">
+                  Berbeda dengan penjual akun ilegal di media sosial yang sering terkena *on hold* atau penipuan, Langganan Yuk menggunakan **akun resmi** yang didaftarkan langsung ke provider resmi. Kami memiliki aturan ketat untuk melindungi privasi dan kenyamanan setiap anggota grup patungan.
+                </p>
+                <p className="text-red-900/80 font-medium text-sm leading-relaxed">
+                  Setiap pengguna diberikan profil khusus dan dilarang keras mengubah password akun. Jika terjadi kendala akses, Customer Support kami yang responsif di WhatsApp siap membantu memulihkan akun atau mereset password dalam hitungan menit.
+                </p>
+              </div>
+            </div>
+
+            {/* SEO Article 3 */}
+            <div className="flex flex-col md:flex-row gap-6 items-start">
+              <div className="p-3 bg-red-50 rounded-2xl border border-red-100 text-red-600 flex-shrink-0">
+                <HeartHandshake size={28} />
+              </div>
+              <div>
+                <h3 className="text-xl font-bold text-red-950 mb-3">Bagaimana Cara Memulai Patungan Akun Premium?</h3>
+                <p className="text-red-900/80 font-medium text-sm leading-relaxed mb-4">
+                  Kami merancang alur transaksi sesederhana mungkin tanpa memerlukan pendaftaran akun yang rumit. Ikuti 4 langkah mudah berikut:
+                </p>
+                <div className="grid sm:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-2 bg-red-50/50 p-4 rounded-xl border border-red-50">
+                    <CheckCircle2 size={16} className="text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold text-red-950 mb-1">1. Pilih Layanan Digital</h4>
+                      <p className="text-xs text-red-800 font-medium leading-relaxed">Tentukan layanan premium yang Anda inginkan dari katalog kami.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-red-50/50 p-4 rounded-xl border border-red-50">
+                    <CheckCircle2 size={16} className="text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold text-red-950 mb-1">2. Pilih & Masuk Antrean</h4>
+                      <p className="text-xs text-red-800 font-medium leading-relaxed">Pilih grup patungan aktif yang masih kosong dan isi data WhatsApp Anda.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-red-50/50 p-4 rounded-xl border border-red-50">
+                    <CheckCircle2 size={16} className="text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold text-red-950 mb-1">3. Scan QRIS & Bayar</h4>
+                      <p className="text-xs text-red-800 font-medium leading-relaxed">Lakukan pembayaran instan menggunakan E-Wallet atau M-Banking favorit Anda.</p>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-2 bg-red-50/50 p-4 rounded-xl border border-red-50">
+                    <CheckCircle2 size={16} className="text-red-600 flex-shrink-0 mt-0.5" />
+                    <div>
+                      <h4 className="text-xs font-bold text-red-950 mb-1">4. Terima Akun via WA</h4>
+                      <p className="text-xs text-red-800 font-medium leading-relaxed">Setelah kuota grup penuh, detail login akun akan langsung dikirim via WhatsApp.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* FOOTER */}
+      <footer className="bg-red-950 text-red-100 py-12 border-t border-red-900 mt-auto">
+        <div className="max-w-6xl mx-auto px-6 grid md:grid-cols-3 gap-8">
+          <div>
+            <h4 className="font-bold text-white text-lg mb-4">Langganan Yuk</h4>
+            <p className="text-xs text-red-200/80 font-semibold leading-relaxed">
+              Platform patungan premium nomor satu di Indonesia. Menyediakan akses Netflix, Spotify, Claude, dan ChatGPT Premium dengan harga hemat bulanan.
+            </p>
+          </div>
+          <div>
+            <h4 className="font-bold text-white text-sm mb-4">Navigasi Halaman</h4>
+            <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
+              <Link href="/" className="hover:text-white transition-colors">Home</Link>
+              <Link href="/layanan" className="hover:text-white transition-colors">Katalog Layanan</Link>
+              <Link href="/faq" className="hover:text-white transition-colors">Tanya Jawab (FAQ)</Link>
+              <Link href="/contact" className="hover:text-white transition-colors">Hubungi Kami</Link>
+            </div>
+          </div>
+          <div>
+            <h4 className="font-bold text-white text-sm mb-4">Layanan Populer</h4>
+            <div className="flex flex-wrap gap-2">
+              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Patungan Netflix Premium</span>
+              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Spotify Family Murah</span>
+              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Akun Claude Pro</span>
+              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Patungan ChatGPT Plus</span>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-6xl mx-auto px-6 border-t border-red-900/60 mt-8 pt-6 text-center text-xs text-red-300 font-semibold">
+          <p>© 2026 Langganan Yuk. All Rights Reserved. Seluruh hak cipta dilindungi undang-undang.</p>
+        </div>
+      </footer>
     </div>
   );
 }

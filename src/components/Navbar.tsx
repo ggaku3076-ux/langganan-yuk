@@ -14,23 +14,25 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b border-red-50">
-      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+    <header className="sticky top-0 z-50 bg-white border-b border-red-50 py-3 shadow-sm">
+      <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-2.5">
+        {/* Centered Logo */}
         <Link href="/" className="flex items-center gap-2 cursor-pointer group">
-          <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold text-lg transition-transform group-hover:scale-105">
+          <div className="w-7 h-7 rounded-md bg-red-600 flex items-center justify-center text-white font-bold text-sm transition-transform group-hover:scale-105">
             L
           </div>
-          <span className="font-bold text-xl text-red-600 tracking-tight">
+          <span className="font-bold text-lg text-red-600 tracking-tight">
             Langganan Yuk
           </span>
         </Link>
         
-        <nav className="hidden md:flex gap-6">
+        {/* Centered Navigation Links */}
+        <nav className="flex gap-6 justify-center">
           {links.map((link) => (
             <Link 
               key={link.path} 
               href={link.path}
-              className={`font-semibold text-sm transition-colors ${
+              className={`font-semibold text-xs transition-colors ${
                 pathname === link.path 
                   ? "text-red-600" 
                   : "text-red-900/70 hover:text-red-600"
@@ -40,11 +42,6 @@ export default function Navbar() {
             </Link>
           ))}
         </nav>
-
-        {/* Mobile menu indicator */}
-        <div className="md:hidden text-red-600 font-semibold text-sm cursor-pointer hover:text-red-700">
-          Menu
-        </div>
       </div>
     </header>
   );
