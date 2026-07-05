@@ -14,26 +14,26 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 bg-white border-b-2 border-red-100">
-      <div className="max-w-6xl mx-auto px-6 h-20 flex items-center justify-between">
-        <Link href="/" className="flex items-center gap-3 cursor-pointer group">
-          <div className="w-10 h-10 rounded-lg bg-red-600 flex items-center justify-center text-white font-black text-xl group-hover:scale-105 transition-transform">
+    <header className="sticky top-0 z-50 bg-white border-b border-red-50">
+      <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+        <Link href="/" className="flex items-center gap-2 cursor-pointer group">
+          <div className="w-8 h-8 rounded-lg bg-red-600 flex items-center justify-center text-white font-bold text-lg transition-transform group-hover:scale-105">
             L
           </div>
-          <span className="font-extrabold text-2xl tracking-tight text-red-600">
+          <span className="font-bold text-xl text-red-600 tracking-tight">
             Langganan Yuk
           </span>
         </Link>
         
-        <nav className="hidden md:flex gap-8">
+        <nav className="hidden md:flex gap-6">
           {links.map((link) => (
             <Link 
               key={link.path} 
               href={link.path}
-              className={`font-bold transition-colors ${
+              className={`font-semibold text-sm transition-colors ${
                 pathname === link.path 
                   ? "text-red-600" 
-                  : "text-red-800 hover:text-red-600"
+                  : "text-red-900/70 hover:text-red-600"
               }`}
             >
               {link.name}
@@ -41,8 +41,8 @@ export default function Navbar() {
           ))}
         </nav>
 
-        {/* Mobile menu could be added here later */}
-        <div className="md:hidden text-red-600 font-bold">
+        {/* Mobile menu indicator */}
+        <div className="md:hidden text-red-600 font-semibold text-sm cursor-pointer hover:text-red-700">
           Menu
         </div>
       </div>

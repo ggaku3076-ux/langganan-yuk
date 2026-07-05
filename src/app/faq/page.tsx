@@ -16,13 +16,13 @@ export default function FaqPage() {
 
   return (
     <div className="max-w-3xl mx-auto px-6 py-16 w-full flex-1">
-      <h1 className="text-4xl font-black text-red-950 mb-10 text-center">Frequently Asked Questions (FAQ)</h1>
+      <h1 className="text-3xl md:text-4xl font-bold text-red-950 mb-10 text-center tracking-tight">Frequently Asked Questions (FAQ)</h1>
       
-      <div className="space-y-6">
+      <div className="space-y-4">
         {faqs.map((faq, i) => (
-          <div key={i} className="bg-white p-6 rounded-2xl border-2 border-red-100">
-            <h3 className="text-xl font-black text-red-600 mb-3">{faq.q}</h3>
-            <p className="text-red-900 font-bold leading-relaxed">{faq.a}</p>
+          <div key={i} className="bg-white p-6 rounded-2xl border border-red-100 shadow-sm">
+            <h3 className="text-lg font-bold text-red-600 mb-2">{faq.q}</h3>
+            <p className="text-red-900 font-semibold leading-relaxed text-sm">{faq.a}</p>
           </div>
         ))}
       </div>

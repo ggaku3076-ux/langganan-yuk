@@ -40,26 +40,26 @@ export default function CheckoutClient({ service }: { service: any }) {
   };
 
   return (
-    <div className="flex-1 py-12 px-6 bg-red-50/20">
+    <div className="flex-1 py-12 px-6 bg-red-50/10">
       <AnimatePresence mode="wait">
         
         {/* CHECKOUT STATE */}
         {appState === "checkout" && (
           <motion.div
             key="checkout"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            transition={{ duration: 0.3 }}
+            exit={{ opacity: 0, scale: 0.98 }}
+            transition={{ duration: 0.25 }}
             className="max-w-2xl mx-auto"
           >
-            <Link href="/" className="inline-flex items-center gap-2 text-red-700 font-black mb-8 hover:text-red-600 transition-colors group">
-              <ArrowLeft size={18} className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Katalog
+            <Link href="/" className="inline-flex items-center gap-2 text-red-700 font-bold mb-6 hover:text-red-600 transition-colors group">
+              <ArrowLeft size={16} className="group-hover:-translate-x-1 transition-transform" /> Kembali ke Katalog
             </Link>
             
-            <div className="bg-white p-8 md:p-12 rounded-[2.5rem] border-2 border-red-100 shadow-2xl shadow-red-900/5">
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-6 mb-10 pb-10 border-b-2 border-red-50">
-                <div className="h-24 w-32 flex items-center justify-center p-4 bg-white border-2 border-red-100 rounded-3xl shadow-sm">
+            <div className="bg-white p-8 md:p-10 rounded-3xl border border-red-100 shadow-xl shadow-red-900/5">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-5 mb-8 pb-8 border-b border-red-100">
+                <div className="h-20 w-28 flex items-center justify-center p-3 bg-white border border-red-100 rounded-2xl shadow-sm">
                    <img 
                     src={service.logoUrl} 
                     alt={service.name} 
@@ -67,17 +67,17 @@ export default function CheckoutClient({ service }: { service: any }) {
                   />
                 </div>
                 <div>
-                  <h2 className="text-3xl font-black text-red-950 tracking-tight mb-2">{service.name}</h2>
-                  <div className="flex items-center gap-3">
-                    <p className="text-red-600 font-black text-2xl">{formatRupiah(service.sharedPrice)}</p>
-                    <span className="px-3 py-1 bg-red-50 text-red-700 font-bold text-xs rounded-full">Per Bulan</span>
+                  <h2 className="text-2xl font-bold text-red-950 tracking-tight mb-1">{service.name}</h2>
+                  <div className="flex items-center gap-2">
+                    <p className="text-red-600 font-bold text-xl">{formatRupiah(service.sharedPrice)}</p>
+                    <span className="px-2 py-0.5 bg-red-50 text-red-700 font-semibold text-xs rounded-full">Per Bulan</span>
                   </div>
                 </div>
               </div>
 
-              <div className="space-y-8">
+              <div className="space-y-6">
                 <div>
-                  <label className="block text-sm font-black text-red-950 mb-3">
+                  <label className="block text-sm font-semibold text-red-950 mb-2">
                     Nama Panggilan
                   </label>
                   <input 
@@ -85,12 +85,12 @@ export default function CheckoutClient({ service }: { service: any }) {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Misal: Budi Santoso"
-                    className="w-full px-6 py-4 bg-red-50/50 border-2 border-red-100 rounded-2xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-bold text-lg"
+                    className="w-full px-5 py-3.5 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-base"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-black text-red-950 mb-3">
+                  <label className="block text-sm font-semibold text-red-950 mb-2">
                     Nomor WhatsApp Aktif
                   </label>
                   <input 
@@ -98,34 +98,34 @@ export default function CheckoutClient({ service }: { service: any }) {
                     value={whatsapp}
                     onChange={(e) => setWhatsapp(e.target.value)}
                     placeholder="08123456789"
-                    className="w-full px-6 py-4 bg-red-50/50 border-2 border-red-100 rounded-2xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-bold text-lg"
+                    className="w-full px-5 py-3.5 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-base"
                   />
-                  <p className="text-sm text-red-700 mt-3 flex items-center gap-2 font-bold bg-red-50 p-3 rounded-xl">
-                    <AlertCircle size={16} className="text-red-600 flex-shrink-0" /> Akun premium akan dikirim ke nomor ini via WA.
+                  <p className="text-xs text-red-700 mt-2 flex items-center gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
+                    <AlertCircle size={14} className="text-red-600 flex-shrink-0" /> Akun premium akan dikirim ke nomor ini via WA.
                   </p>
                 </div>
 
-                <div className="flex items-start gap-4 p-6 bg-white border-2 border-red-100 rounded-2xl mt-4 cursor-pointer hover:border-red-300 transition-colors" onClick={() => setAgreed(!agreed)}>
-                  <div className="relative flex items-start pt-1">
-                    <div className={`w-6 h-6 rounded-lg border-2 flex items-center justify-center transition-colors ${agreed ? 'bg-red-600 border-red-600' : 'border-red-300 bg-white'}`}>
-                      <CheckCircle2 size={16} className={`text-white transition-opacity ${agreed ? 'opacity-100' : 'opacity-0'}`} strokeWidth={3} />
+                <div className="flex items-start gap-3 p-4 bg-white border border-red-100 rounded-xl mt-4 cursor-pointer hover:border-red-200 transition-colors" onClick={() => setAgreed(!agreed)}>
+                  <div className="relative flex items-start pt-0.5">
+                    <div className={`w-5 h-5 rounded-md border flex items-center justify-center transition-colors ${agreed ? 'bg-red-600 border-red-600' : 'border-red-300 bg-white'}`}>
+                      <CheckCircle2 size={12} className={`text-white transition-opacity ${agreed ? 'opacity-100' : 'opacity-0'}`} strokeWidth={3} />
                     </div>
                   </div>
-                  <div className="text-sm text-red-900 leading-relaxed font-bold">
-                    Saya menyetujui Syarat & Ketentuan. <strong className="text-red-600 block mt-1">Dilarang mengubah profil atau password orang lain di dalam akun.</strong>
+                  <div className="text-sm text-red-900 leading-relaxed font-semibold">
+                    Saya menyetujui Syarat & Ketentuan. <strong className="text-red-600 block mt-0.5">Dilarang mengubah profil atau password orang lain di dalam akun.</strong>
                   </div>
                 </div>
 
                 <button 
                   disabled={!name || !whatsapp || !agreed || isLoading}
                   onClick={handleCheckout}
-                  className="relative w-full py-5 px-6 bg-red-600 hover:bg-red-700 disabled:bg-red-100 disabled:text-red-300 disabled:cursor-not-allowed text-white rounded-2xl font-black text-xl transition-all active:scale-[0.98] mt-8 flex justify-center items-center gap-3 overflow-hidden group shadow-[0_10px_20px_-10px_rgba(220,38,38,0.5)] disabled:shadow-none"
+                  className="relative w-full py-4 px-6 bg-red-600 hover:bg-red-700 disabled:bg-red-50 disabled:text-red-300 disabled:cursor-not-allowed text-white rounded-xl font-bold text-lg transition-all active:scale-[0.98] mt-6 flex justify-center items-center gap-2 overflow-hidden group shadow-md"
                 >
                   {isLoading ? (
-                    <Loader2 size={24} className="animate-spin" />
+                    <Loader2 size={20} className="animate-spin" />
                   ) : (
                     <>
-                      <QrCode size={24} className="group-hover:scale-110 transition-transform" /> Bayar Sekarang
+                      <QrCode size={20} className="group-hover:scale-105 transition-transform" /> Bayar Sekarang
                     </>
                   )}
                 </button>
@@ -138,41 +138,41 @@ export default function CheckoutClient({ service }: { service: any }) {
         {appState === "payment" && (
           <motion.div
             key="payment"
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="max-w-lg mx-auto"
+            exit={{ opacity: 0, scale: 0.98 }}
+            className="max-w-md mx-auto"
           >
-            <div className="bg-white p-12 rounded-[2.5rem] border-2 border-red-100 shadow-2xl shadow-red-900/5 text-center relative overflow-hidden">
-              <div className="absolute top-0 left-0 w-full h-2 bg-red-600" />
+            <div className="bg-white p-10 rounded-3xl border border-red-100 shadow-xl text-center relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-full h-1 bg-red-600" />
               
-              <h2 className="text-3xl font-black mb-3 text-red-950">Selesaikan Pembayaran</h2>
-              <p className="text-red-700 text-base mb-10 font-bold">Buka M-Banking atau E-Wallet Anda lalu scan kode QR di bawah ini.</p>
+              <h2 className="text-2xl font-bold mb-2 text-red-950">Selesaikan Pembayaran</h2>
+              <p className="text-red-700 text-sm mb-8 font-semibold">Buka M-Banking atau E-Wallet Anda lalu scan kode QR di bawah ini.</p>
               
-              <div className="bg-white p-6 rounded-[2rem] inline-block mb-10 border-2 border-red-100 shadow-lg shadow-red-100">
-                <div className="w-56 h-56 border-4 border-red-50 rounded-2xl flex items-center justify-center bg-white">
+              <div className="bg-white p-4 rounded-2xl inline-block mb-8 border border-red-100 shadow-sm">
+                <div className="w-48 h-48 border border-red-50 rounded-xl flex items-center justify-center bg-white">
                   {isLoading ? (
-                    <Loader2 size={48} className="text-red-300 animate-spin" />
+                    <Loader2 size={36} className="text-red-300 animate-spin" />
                   ) : (
-                    <QrCode size={200} className="text-red-950" strokeWidth={1.2} />
+                    <QrCode size={180} className="text-red-950" strokeWidth={1.2} />
                   )}
                 </div>
               </div>
               
-              <div className="mb-10">
-                <p className="text-sm text-red-700 font-bold mb-2 uppercase tracking-widest">Total Tagihan</p>
-                <p className="text-5xl font-black text-red-600">{formatRupiah(service.sharedPrice)}</p>
+              <div className="mb-8">
+                <p className="text-xs text-red-700 font-bold mb-1 uppercase tracking-wider">Total Tagihan</p>
+                <p className="text-3xl font-bold text-red-600">{formatRupiah(service.sharedPrice)}</p>
               </div>
 
-              <div className="flex items-center justify-center gap-3 text-sm font-black text-red-700 bg-red-50 py-4 px-8 rounded-full mb-10 w-max mx-auto border border-red-100">
-                <AlertCircle size={18} className="text-red-600" />
-                Batas Waktu: <span className="text-red-600 text-lg ml-1">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
+              <div className="flex items-center justify-center gap-2 text-xs font-bold text-red-700 bg-red-50 py-3 px-6 rounded-full mb-8 w-max mx-auto border border-red-100">
+                <AlertCircle size={16} className="text-red-600" />
+                Batas Waktu: <span className="text-red-600 text-sm ml-1 font-bold">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
               </div>
 
               <button 
                 onClick={handlePayment}
                 disabled={isLoading}
-                className="w-full py-5 text-base font-black border-2 border-red-100 text-red-950 hover:bg-red-50 rounded-2xl transition-all active:scale-95 disabled:opacity-50"
+                className="w-full py-4 text-sm font-bold border border-red-100 text-red-950 hover:bg-red-50 rounded-xl transition-all active:scale-95 disabled:opacity-50"
               >
                 {isLoading ? "Memverifikasi..." : "[Simulasi] Konfirmasi Pembayaran"}
               </button>
@@ -184,54 +184,54 @@ export default function CheckoutClient({ service }: { service: any }) {
         {appState === "waiting" && (
           <motion.div
             key="waiting"
-            initial={{ opacity: 0, scale: 0.9 }}
+            initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             className="max-w-xl mx-auto"
           >
-            <div className="bg-white p-12 rounded-[2.5rem] border-2 border-red-100 shadow-2xl shadow-red-900/5 text-center">
+            <div className="bg-white p-10 rounded-3xl border border-red-100 shadow-xl text-center">
               <motion.div 
                 initial={{ scale: 0 }}
                 animate={{ scale: 1 }}
-                transition={{ type: "spring", bounce: 0.5 }}
-                className="w-28 h-28 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-10 shadow-[0_0_40px_rgba(220,38,38,0.4)]"
+                transition={{ type: "spring", bounce: 0.4 }}
+                className="w-20 h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-8 shadow-md"
               >
-                <CheckCircle2 size={56} className="text-white" strokeWidth={2.5} />
+                <CheckCircle2 size={36} className="text-white" strokeWidth={2.5} />
               </motion.div>
               
-              <h2 className="text-4xl font-black mb-4 text-red-950 tracking-tight">Pembayaran Sukses!</h2>
-              <p className="text-red-800 text-lg mb-12 font-bold leading-relaxed">
+              <h2 className="text-3xl font-bold mb-3 text-red-950 tracking-tight">Pembayaran Sukses!</h2>
+              <p className="text-red-800 text-base mb-8 font-semibold leading-relaxed">
                 Anda telah resmi bergabung ke grup patungan <br/>
-                <span className="inline-block mt-2 px-4 py-1.5 bg-red-50 border border-red-200 text-red-700 rounded-xl">{service.name}</span>
+                <span className="inline-block mt-1.5 px-3 py-1 bg-red-50 border border-red-100 text-red-700 rounded-lg text-sm">{service.name}</span>
               </p>
 
-              <div className="bg-white p-8 rounded-[2rem] text-left border-2 border-red-100 mb-10">
-                <div className="flex justify-between text-base mb-5">
-                  <span className="font-black text-red-950">Status Antrean Grup</span>
-                  <span className="text-red-600 font-black text-xl">{service.filledSlots + 1} <span className="text-red-400 text-sm">/ {service.totalSlots} Orang</span></span>
+              <div className="bg-white p-6 rounded-2xl text-left border border-red-100 mb-8">
+                <div className="flex justify-between text-sm mb-4">
+                  <span className="font-bold text-red-950">Status Antrean Grup</span>
+                  <span className="text-red-600 font-bold text-base">{service.filledSlots + 1} <span className="text-red-400 text-xs">/ {service.totalSlots} Orang</span></span>
                 </div>
                 
-                <div className="w-full bg-red-50 rounded-full h-6 overflow-hidden mb-8 border border-red-100 p-1">
+                <div className="w-full bg-red-50 rounded-full h-4 overflow-hidden mb-6 border border-red-100 p-0.5">
                   <motion.div 
                     initial={{ width: `${(service.filledSlots / service.totalSlots) * 100}%` }}
                     animate={{ width: `${((service.filledSlots + 1) / service.totalSlots) * 100}%` }}
-                    transition={{ delay: 0.5, duration: 2, ease: "circOut" }}
+                    transition={{ delay: 0.5, duration: 1.5, ease: "circOut" }}
                     className="h-full bg-red-600 rounded-full relative overflow-hidden"
                   >
                     <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:20px_20px] animate-[shimmer_1s_infinite_linear]" />
                   </motion.div>
                 </div>
                 
-                <div className="flex items-start gap-4 bg-red-50/50 p-6 rounded-2xl border border-red-100">
-                  <div className="w-3 h-3 bg-red-600 rounded-full mt-1.5 animate-pulse flex-shrink-0"></div>
-                  <p className="text-base text-red-900 leading-relaxed font-bold">
-                    Menunggu <strong className="text-red-600 text-lg">{service.totalSlots - (service.filledSlots + 1)} orang lagi</strong> bergabung. Jika kuota penuh, email & password akan langsung dikirim otomatis ke WhatsApp <span className="text-red-600 underline decoration-red-300 underline-offset-4">{whatsapp}</span>.
+                <div className="flex items-start gap-3 bg-red-50/50 p-4 rounded-xl border border-red-50">
+                  <div className="w-2 h-2 bg-red-600 rounded-full mt-1.5 animate-pulse flex-shrink-0"></div>
+                  <p className="text-sm text-red-900 leading-relaxed font-semibold">
+                    Menunggu <strong className="text-red-600">{service.totalSlots - (service.filledSlots + 1)} orang lagi</strong> bergabung. Jika kuota penuh, email & password akan dikirim otomatis ke WhatsApp <span className="text-red-600 underline decoration-red-300 underline-offset-4">{whatsapp}</span>.
                   </p>
                 </div>
               </div>
 
               <Link 
                 href="/"
-                className="block w-full py-5 px-6 bg-red-950 text-white hover:bg-red-900 rounded-2xl font-black text-xl transition-all active:scale-[0.98] text-center shadow-lg"
+                className="block w-full py-4 px-6 bg-red-950 text-white hover:bg-red-900 rounded-xl font-bold text-base transition-all active:scale-[0.98] text-center"
               >
                 Kembali ke Beranda
               </Link>
