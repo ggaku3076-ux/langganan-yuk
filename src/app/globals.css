@@ -1,6 +1,4 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 :root {
   --background: #ffffff; 
@@ -9,7 +7,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #ffffff; /* keep it white, strictly red/white */
+    --background: #ffffff; 
     --foreground: #450a0a; 
   }
 }
@@ -26,7 +24,7 @@ body {
 }
 
 @keyframes shimmer {
-  100% {
+  to {
     transform: translateX(100%);
   }
 }
