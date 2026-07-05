@@ -12,6 +12,30 @@
   }
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom Scrollbar Styles */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #ffffff;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #ffe2e2; /* red-100 */
+  border-radius: 9999px;
+  border: 2px solid #ffffff;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #dc2626; /* red-600 */
+}
+
 body {
   color: var(--foreground);
   background: var(--background);
