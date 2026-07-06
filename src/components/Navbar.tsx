@@ -10,6 +10,8 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const isHome = pathname === "/";
+  const isLayanan = pathname === "/layanan";
+  const isRedNavbar = isHome || isLayanan;
 
   const links = [
     { name: "Home", path: "/" },
@@ -21,15 +23,17 @@ export default function Navbar() {
   return (
     <div className={`${isHome ? "absolute top-0 left-0" : "sticky top-4"} z-50 w-full px-4 md:px-6`}>
       <header 
-        className={`max-w-5xl mx-auto rounded-2xl transition-all duration-300 ${
+        className={`max-w-5xl mx-auto rounded-2xl transition-all duration-200 ${
           isHome 
             ? "bg-transparent border-none shadow-none" 
-            : "bg-white/95 backdrop-blur-md border border-red-100/50 shadow-[0_8px_30px_rgb(220,38,38,0.03)]"
+            : isLayanan
+              ? "bg-[#E21F1F] border border-red-700/30 shadow-[0_8px_30px_rgba(226,31,31,0.08)]"
+              : "bg-white md:bg-white/95 md:backdrop-blur-md border border-red-100/50 shadow-[0_8px_30px_rgb(220,38,38,0.03)]"
         }`}
       >
         <div className="px-6 h-14 md:h-16 flex items-center justify-between">
           
-          {/* Logo + Brand Name (Balanced, cache-busted emblem v3) */}
+          {/* Logo + Brand Name */}
           <Link 
             href="/" 
             className="flex items-center gap-2 md:gap-2.5 cursor-pointer group"
@@ -41,7 +45,7 @@ export default function Navbar() {
               className="h-8 w-auto md:h-10 object-contain transition-transform group-hover:scale-105" 
             />
             <span className={`font-extrabold text-base md:text-lg tracking-tight transition-colors ${
-              isHome ? "text-white group-hover:text-white/90" : "text-[#E21F1F] group-hover:text-[#b11414]"
+              isRedNavbar ? "text-white group-hover:text-white/90" : "text-[#E21F1F] group-hover:text-[#b11414]"
             }`}>
               LanggananYuk
             </span>
@@ -54,7 +58,7 @@ export default function Navbar() {
                 key={link.path} 
                 href={link.path}
                 className={`font-semibold text-sm transition-colors py-1 ${
-                  isHome
+                  isRedNavbar
                     ? pathname === link.path
                       ? "text-white border-b-2 border-white"
                       : "text-white/80 hover:text-white"
@@ -75,7 +79,7 @@ export default function Navbar() {
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm ${
-                isHome
+                isRedNavbar
                   ? "border border-white bg-transparent text-white hover:bg-white hover:text-[#E21F1F]"
                   : "bg-red-600 text-white hover:bg-red-700"
               }`}
@@ -84,11 +88,11 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Menu Button (Optimized transition, zero expensive triggers) */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`md:hidden p-1.5 rounded-lg transition-colors focus:outline-none ${
-              isHome
+              isRedNavbar
                 ? "text-white bg-red-800/40 hover:bg-red-800/60"
                 : "text-red-600 bg-red-50 hover:bg-red-100"
             }`}
@@ -99,16 +103,16 @@ export default function Navbar() {
 
         </div>
 
-        {/* Mobile Dropdown Menu (GPU-Accelerated) */}
+        {/* Mobile Dropdown Menu (Fast rendering, solid backgrounds to eliminate mobile GPU lag) */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
-              initial={{ opacity: 0, y: -8 }}
+              initial={{ opacity: 0, y: -6 }}
               animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.18, ease: "easeOut" }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.12, ease: "easeOut" }}
               className={`md:hidden border-t ${
-                isHome ? "border-red-500 bg-[#E21F1F]/95" : "border-red-50 bg-white"
+                isRedNavbar ? "border-red-500 bg-[#E21F1F]" : "border-red-50 bg-white"
               } rounded-b-2xl`}
             >
               <div className="px-6 py-4 flex flex-col gap-3">
@@ -118,7 +122,7 @@ export default function Navbar() {
                     href={link.path}
                     onClick={() => setIsMenuOpen(false)}
                     className={`font-bold text-sm py-2 transition-colors ${
-                      isHome
+                      isRedNavbar
                         ? pathname === link.path
                           ? "text-white pl-2 border-l-2 border-white"
                           : "text-white/80 hover:text-white"
@@ -136,7 +140,7 @@ export default function Navbar() {
                   rel="noopener noreferrer"
                   onClick={() => setIsMenuOpen(false)}
                   className={`flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-colors shadow-sm mt-2 ${
-                    isHome
+                    isRedNavbar
                       ? "bg-white text-[#E21F1F] hover:bg-red-50"
                       : "bg-red-600 text-white hover:bg-red-700"
                   }`}

@@ -70,11 +70,11 @@ export default function Home() {
             {services.map((service, index) => (
               <motion.div 
                 key={service.id}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ delay: index * 0.03, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                whileHover={{ y: -6, scale: 1.015 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: index * 0.02, duration: 0.3 }}
+                whileHover={{ y: -4, scale: 1.015 }}
                 whileTap={{ scale: 0.985 }}
                 className="h-full"
               >
