@@ -9,8 +9,11 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
-  const isHome = pathname === "/";
-  const isLayanan = pathname === "/layanan";
+  
+  // Safely handle trailing slashes (e.g. /layanan/)
+  const cleanPath = pathname ? pathname.replace(/\/$/, "") : "";
+  const isHome = cleanPath === "" || cleanPath === "/";
+  const isLayanan = cleanPath === "/layanan";
   const isRedNavbar = isHome || isLayanan;
 
   const links = [
@@ -59,10 +62,10 @@ export default function Navbar() {
                 href={link.path}
                 className={`font-semibold text-sm transition-colors py-1 ${
                   isRedNavbar
-                    ? pathname === link.path
+                    ? cleanPath === link.path.replace(/\/$/, "")
                       ? "text-white border-b-2 border-white"
                       : "text-white/80 hover:text-white"
-                    : pathname === link.path 
+                    : cleanPath === link.path.replace(/\/$/, "")
                       ? "text-red-600 border-b-2 border-red-600" 
                       : "text-red-950/70 hover:text-red-600"
                 }`}
@@ -88,7 +91,7 @@ export default function Navbar() {
             </a>
           </div>
 
-          {/* Mobile Menu Button (Optimized transition, zero expensive triggers) */}
+          {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`md:hidden p-1.5 rounded-lg transition-colors focus:outline-none ${
@@ -103,7 +106,7 @@ export default function Navbar() {
 
         </div>
 
-        {/* Mobile Dropdown Menu (Fast rendering, solid backgrounds to eliminate mobile GPU lag) */}
+        {/* Mobile Dropdown Menu */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
@@ -123,10 +126,10 @@ export default function Navbar() {
                     onClick={() => setIsMenuOpen(false)}
                     className={`font-bold text-sm py-2 transition-colors ${
                       isRedNavbar
-                        ? pathname === link.path
+                        ? cleanPath === link.path.replace(/\/$/, "")
                           ? "text-white pl-2 border-l-2 border-white"
                           : "text-white/80 hover:text-white"
-                        : pathname === link.path 
+                        : cleanPath === link.path.replace(/\/$/, "")
                           ? "text-red-600 pl-2 border-l-2 border-red-600" 
                           : "text-red-950/70 hover:text-red-600"
                     }`}
