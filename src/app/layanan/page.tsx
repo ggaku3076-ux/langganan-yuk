@@ -2,7 +2,6 @@
 
 import { services, formatRupiah } from "@/data/services";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 export default function LayananPage() {
   return (
@@ -13,19 +12,14 @@ export default function LayananPage() {
       </div>
       
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        {services.map((service, index) => (
-          <motion.div
+        {services.map((service) => (
+          <div
             key={service.id}
-            initial={{ opacity: 0, y: 15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.03, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-            whileHover={{ y: -6, scale: 1.015 }}
-            whileTap={{ scale: 0.985 }}
             className="h-full"
           >
             <Link 
               href={`/checkout/${service.id}`}
-              className="group flex flex-col justify-between bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-all duration-200 hover:shadow-lg relative overflow-hidden h-full"
+              className="group flex flex-col justify-between bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden h-full"
             >
               <div>
                 <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1">
@@ -51,7 +45,7 @@ export default function LayananPage() {
                 <p className="text-[10px] sm:text-xs font-semibold text-red-800">per bulan</p>
               </div>
             </Link>
-          </motion.div>
+          </div>
         ))}
       </div>
     </div>
