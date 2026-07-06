@@ -8,10 +8,10 @@ import { motion } from "framer-motion";
 export default function Home() {
   return (
     <div className="w-full flex flex-col">
-      {/* SECTION 1: HERO SECTION (Compact Height, Styled Background Fit) */}
-      <section className="w-full bg-red-600 bg-[url('/hero-bg.png')] bg-[length:auto_85%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 md:pt-36">
+      {/* SECTION 1: HERO SECTION (Exact Matching background color #E21F1F to remove seam) */}
+      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.png')] bg-[length:auto_85%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 md:pt-36">
         {/* Dark overlay for better readability on small screens */}
-        <div className="absolute inset-0 bg-red-600/30 md:bg-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-[#E21F1F]/20 md:bg-transparent pointer-events-none" />
         
         <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <div className="max-w-2xl text-left flex flex-col items-start">
@@ -48,7 +48,7 @@ export default function Home() {
             >
               <Link 
                 href="/layanan" 
-                className="inline-block px-8 py-4 bg-white text-red-600 font-bold text-xs sm:text-sm tracking-wider rounded-none uppercase hover:bg-red-50 transition-colors shadow-lg"
+                className="inline-block px-8 py-4 bg-white text-[#E21F1F] font-bold text-xs sm:text-sm tracking-wider rounded-none uppercase hover:bg-red-50 transition-colors shadow-lg"
               >
                 Register Now
               </Link>
@@ -168,7 +168,7 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-8">
             {[
-              { icon: <HelpCircle size={20} />, title: "Apa Keuntungan Patungan?", desc: "Layanan seperti Netflix Premium atau alat kecendasan buatan seperti Claude Pro dan ChatGPT Plus memakan biaya berlangganan mandiri yang tinggi. Melalui sistem patungan, Anda mendapatkan akses legal dengan harga hemat hingga 80%." },
+              { icon: <HelpCircle size={20} />, title: "Apa Keuntungan Patungan?", desc: "Layanan seperti Netflix Premium atau alat kecerdasan buatan seperti Claude Pro dan ChatGPT Plus memakan biaya berlangganan mandiri yang tinggi. Melalui sistem patungan, Anda mendapatkan akses legal dengan harga hemat hingga 80%." },
               { icon: <ShieldCheck size={20} />, title: "Keamanan & Legalitas Terjamin", desc: "Kami hanya menyediakan akun resmi yang didaftarkan langsung ke provider resmi. Kami memberlakukan aturan keras untuk membatasi akses profil dan mencegah penggantian password demi kenyamanan bersama." },
               { icon: <Info size={20} />, title: "Bantuan 24 Jam via WhatsApp", desc: "Lupa password atau profil Anda tidak bisa diakses? Hubungi tim support customer service kami di WhatsApp. Kami akan memulihkan dan mereset kredensial akun dalam waktu singkat." },
               { icon: <CheckCircle2 size={20} />, title: "100% Refund Otomatis", desc: "Jika kuota grup yang Anda pilih tidak kunjung terisi penuh dalam waktu 24 jam setelah pembayaran, sistem kami akan langsung melakukan pengembalian dana (refund) otomatis 100% tanpa potongan." }

@@ -71,7 +71,7 @@ export default function Navbar() {
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm ${
                 isHome
-                  ? "border border-white bg-transparent text-white hover:bg-white hover:text-red-600"
+                  ? "border border-white bg-transparent text-white hover:bg-white hover:text-[#E21F1F]"
                   : "bg-red-600 text-white hover:bg-red-700"
               }`}
             >
@@ -84,7 +84,7 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(!isMenuOpen)}
             className={`md:hidden p-1.5 rounded-lg transition-colors focus:outline-none ${
               isHome
-                ? "text-white bg-red-700/40 hover:bg-red-700/60"
+                ? "text-white bg-red-800/40 hover:bg-red-800/60"
                 : "text-red-600 bg-red-50 hover:bg-red-100"
             }`}
             aria-label="Toggle Menu"
@@ -103,7 +103,7 @@ export default function Navbar() {
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.18, ease: "easeOut" }}
               className={`md:hidden border-t ${
-                isHome ? "border-red-500 bg-red-700/95" : "border-red-50 bg-white"
+                isHome ? "border-red-500 bg-[#E21F1F]/95" : "border-red-50 bg-white"
               } rounded-b-2xl`}
             >
               <div className="px-6 py-4 flex flex-col gap-3">
@@ -132,7 +132,7 @@ export default function Navbar() {
                   onClick={() => setIsMenuOpen(false)}
                   className={`flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-colors shadow-sm mt-2 ${
                     isHome
-                      ? "bg-white text-red-600 hover:bg-red-50"
+                      ? "bg-white text-[#E21F1F] hover:bg-red-50"
                       : "bg-red-600 text-white hover:bg-red-700"
                   }`}
                 >
