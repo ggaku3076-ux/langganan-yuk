@@ -138,14 +138,21 @@ export default function CheckoutClient({ service }: { service: any }) {
                         key={opt.id}
                         type="button"
                         onClick={() => setSelectedOption(opt)}
-                        className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                        className={`p-3 rounded-xl border text-center transition-all cursor-pointer flex flex-col justify-between items-center ${
                           isSelected
                             ? "bg-red-50 border-red-600 ring-2 ring-red-600/10"
                             : "bg-white border-red-100 hover:border-red-300"
                         }`}
                       >
-                        <p className="text-xs sm:text-sm font-bold text-red-950">{opt.label}</p>
-                        <p className="text-[10px] sm:text-xs text-red-600 font-bold mt-0.5">{formatRupiah(opt.price)}</p>
+                        <div className="w-full">
+                          <p className="text-xs sm:text-sm font-bold text-red-950">{opt.label}</p>
+                          <p className="text-[10px] sm:text-xs text-red-600 font-bold mt-0.5">{formatRupiah(opt.price)}</p>
+                        </div>
+                        {opt.note && (
+                          <span className="mt-2 text-[8px] sm:text-[10px] text-red-700/80 font-bold bg-red-100/40 px-1.5 py-0.5 rounded border border-red-100/30">
+                            {opt.note}
+                          </span>
+                        )}
                       </button>
                     );
                   })}
