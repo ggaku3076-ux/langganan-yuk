@@ -4,6 +4,7 @@ import Link from "next/link";
 import { ShieldCheck, Zap, Users, ArrowRight, HelpCircle, CheckCircle2, Info } from "lucide-react";
 import { services, formatRupiah } from "@/data/services";
 import { motion } from "framer-motion";
+import ScrollVelocity from "@/components/ScrollVelocity";
 
 export default function Home() {
   return (
@@ -57,6 +58,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* VELOCITY SCROLL BANNER (Reacts to user scroll speed) */}
+      <ScrollVelocity />
 
       {/* SECTION 2: CATALOG SECTION (White Background, Red-Bordered Cards) */}
       <section className="bg-white py-16 md:py-24 border-t border-red-50">
