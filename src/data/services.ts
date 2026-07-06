@@ -75,11 +75,14 @@ export const services: Service[] = [
     name: "Spotify Premium",
     category: "Entertainment",
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/2/26/Spotify_logo_with_text.svg",
-    originalPrice: 54900,
-    sharedPrice: 13725,
-    totalSlots: 6,
-    filledSlots: 5,
-    description: "Streaming musik bebas iklan dengan kualitas suara 320kbps, download lagu untuk didengarkan offline, dan fitur Group Session untuk mendengarkan bersama teman."
+    originalPrice: 120000,
+    sharedPrice: 50000,
+    totalSlots: 3,
+    filledSlots: 2,
+    description: "Akses musik bebas iklan, bebas lewati lagu tanpa batas, dan fitur unduh untuk mendengarkan lagu secara offline. Pelanggan juga dapat menikmati kualitas audio lossless (hingga 24-bit/44,1 kHz FLAC), memutar lagu sesuai urutan (tanpa shuffle wajib), serta dukungan AI DJ dan pembuatan playlist AI pada paket tertentu.",
+    options: [
+      { id: "3-user", label: "3 User", price: 50000, slots: 3, isDefault: true }
+    ]
   }
 ];
 
