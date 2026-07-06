@@ -42,8 +42,8 @@ export default function Navbar() {
             />
           </Link>
           
-          {/* Desktop Navigation Links + Inline CS Button aligned right */}
-          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
+          {/* Desktop Navigation Links */}
+          <nav className="hidden md:flex items-center gap-8">
             {links.map((link) => (
               <Link 
                 key={link.path} 
@@ -61,21 +61,23 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-            
-            {/* Hubungi CS Button inline next to Contact */}
+          </nav>
+
+          {/* CTA Button (Back to the Right Side) */}
+          <div className="hidden md:flex items-center gap-4">
             <a 
               href="https://wa.me/628123456789"
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm ${
+              className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm ${
                 isHome
                   ? "border border-white bg-transparent text-white hover:bg-white hover:text-red-600"
                   : "bg-red-600 text-white hover:bg-red-700"
               }`}
             >
-              <Send size={11} /> Hubungi CS
+              <Send size={12} /> Hubungi CS
             </a>
-          </nav>
+          </div>
 
           {/* Mobile Menu Button */}
           <button 
@@ -108,6 +110,7 @@ export default function Navbar() {
                 {links.map((link) => (
                   <Link 
                     key={link.path} 
+                    toggleMenu={() => setIsMenuOpen(false)}
                     href={link.path}
                     onClick={() => setIsMenuOpen(false)}
                     className={`font-bold text-sm py-2 transition-colors ${
