@@ -8,8 +8,8 @@ import { motion } from "framer-motion";
 export default function Home() {
   return (
     <div className="w-full flex flex-col">
-      {/* SECTION 1: HERO SECTION (Matching Desktop Prototype Structure and Background) */}
-      <section className="w-full bg-red-600 bg-[url('/hero-bg.png')] bg-cover bg-no-repeat bg-center md:bg-right min-h-[600px] md:min-h-[750px] flex items-center relative py-12 pt-36 md:pt-44">
+      {/* SECTION 1: HERO SECTION (Compact Height & Scaling) */}
+      <section className="w-full bg-red-600 bg-[url('/hero-bg.png')] bg-cover bg-no-repeat bg-center md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 md:pt-36">
         {/* Dark overlay for better readability on small screens */}
         <div className="absolute inset-0 bg-red-600/30 md:bg-transparent pointer-events-none" />
         
@@ -21,7 +21,7 @@ export default function Home() {
               initial={{ opacity: 0, y: -10 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.1, duration: 0.4 }}
-              className="text-white text-sm sm:text-base md:text-lg font-semibold leading-relaxed mb-6 max-w-xl"
+              className="text-white text-xs sm:text-sm md:text-base font-semibold leading-relaxed mb-4 max-w-xl"
             >
               Nikmati akses akun premium favorit Anda secara legal dengan sistem patungan otomatis. Hemat pengeluaran bulanan Anda hingga 80%
             </motion.p>
@@ -31,7 +31,7 @@ export default function Home() {
               initial={{ opacity: 0, y: 15 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-              className="text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter text-white uppercase leading-[1.0] mb-10 font-sans"
+              className="text-3xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white uppercase leading-[1.05] mb-6 font-sans"
             >
               Patungan <br/>
               Premium Aman <br/>
@@ -48,7 +48,7 @@ export default function Home() {
             >
               <Link 
                 href="/layanan" 
-                className="inline-block px-10 py-5 bg-white text-red-600 font-bold text-sm sm:text-base tracking-wider rounded-none uppercase hover:bg-red-50 transition-colors shadow-lg"
+                className="inline-block px-8 py-4 bg-white text-red-600 font-bold text-xs sm:text-sm tracking-wider rounded-none uppercase hover:bg-red-50 transition-colors shadow-lg"
               >
                 Register Now
               </Link>
