@@ -29,14 +29,14 @@ export default function Navbar() {
       >
         <div className="px-6 h-14 md:h-16 flex items-center justify-between">
           
-          {/* Logo + Brand Name (Balanced, professional sizing) */}
+          {/* Logo + Brand Name (Balanced, cache-busted emblem v3) */}
           <Link 
             href="/" 
             className="flex items-center gap-2 md:gap-2.5 cursor-pointer group"
             onClick={() => setIsMenuOpen(false)}
           >
             <img 
-              src="/logo-emblem.png" 
+              src="/logo-emblem.png?v=3" 
               alt="Layanan Yuk Emblem" 
               className="h-8 w-auto md:h-10 object-contain transition-transform group-hover:scale-105" 
             />
