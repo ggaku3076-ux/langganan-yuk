@@ -27,20 +27,20 @@ export default function Navbar() {
             : "bg-white/95 backdrop-blur-md border border-red-100/50 shadow-[0_8px_30px_rgb(220,38,38,0.03)]"
         }`}
       >
-        <div className="px-6 h-18 md:h-22 flex items-center justify-between">
+        <div className="px-6 h-14 md:h-16 flex items-center justify-between">
           
-          {/* Logo + Brand Name (Enlarged and aligned next to each other) */}
+          {/* Logo + Brand Name (Balanced, professional sizing) */}
           <Link 
             href="/" 
-            className="flex items-center gap-2.5 md:gap-3.5 cursor-pointer group"
+            className="flex items-center gap-2 md:gap-2.5 cursor-pointer group"
             onClick={() => setIsMenuOpen(false)}
           >
             <img 
               src="/logo-emblem.png" 
               alt="Layanan Yuk Emblem" 
-              className="h-12 w-auto md:h-16 object-contain transition-transform group-hover:scale-105" 
+              className="h-8 w-auto md:h-10 object-contain transition-transform group-hover:scale-105" 
             />
-            <span className={`font-black text-xl md:text-2xl tracking-tighter transition-colors ${
+            <span className={`font-extrabold text-base md:text-lg tracking-tight transition-colors ${
               isHome ? "text-white group-hover:text-white/90" : "text-[#E21F1F] group-hover:text-[#b11414]"
             }`}>
               LanggananYuk
