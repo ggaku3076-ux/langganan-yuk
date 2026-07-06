@@ -29,7 +29,7 @@ export default function Navbar() {
       >
         <div className="px-6 h-16 md:h-20 flex items-center justify-between">
           
-          {/* Logo (Original Logo Image) */}
+          {/* Logo */}
           <Link 
             href="/" 
             className="flex items-center cursor-pointer group"
@@ -42,8 +42,8 @@ export default function Navbar() {
             />
           </Link>
           
-          {/* Navigation Links */}
-          <nav className="hidden md:flex items-center gap-8">
+          {/* Desktop Navigation Links + Inline CS Button aligned right */}
+          <nav className="hidden md:flex items-center gap-6 lg:gap-8">
             {links.map((link) => (
               <Link 
                 key={link.path} 
@@ -61,23 +61,21 @@ export default function Navbar() {
                 {link.name}
               </Link>
             ))}
-          </nav>
-
-          {/* CTA Button */}
-          <div className="hidden md:flex items-center gap-4">
+            
+            {/* Hubungi CS Button inline next to Contact */}
             <a 
               href="https://wa.me/628123456789"
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm ${
+              className={`inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold rounded-xl transition-all shadow-sm ${
                 isHome
                   ? "border border-white bg-transparent text-white hover:bg-white hover:text-red-600"
                   : "bg-red-600 text-white hover:bg-red-700"
               }`}
             >
-              <Send size={12} /> Hubungi CS
+              <Send size={11} /> Hubungi CS
             </a>
-          </div>
+          </nav>
 
           {/* Mobile Menu Button */}
           <button 
