@@ -10,11 +10,12 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   
-  // Safely handle trailing slashes (e.g. /layanan/)
+  // Safely handle trailing slashes
   const cleanPath = pathname ? pathname.replace(/\/$/, "") : "";
   const isHome = cleanPath === "" || cleanPath === "/";
-  const isLayanan = cleanPath === "/layanan";
-  const isRedNavbar = isHome || isLayanan;
+  
+  // All pages (Home, Layanan, FAQ, Contact, Checkout) use white text / logo on red or transparent backgrounds
+  const isRedNavbar = true; 
 
   const links = [
     { name: "Home", path: "/" },
@@ -29,9 +30,7 @@ export default function Navbar() {
         className={`max-w-5xl mx-auto rounded-2xl transition-all duration-200 ${
           isHome 
             ? "bg-transparent border-none shadow-none" 
-            : isLayanan
-              ? "bg-[#E21F1F] border border-red-700/30 shadow-[0_8px_30px_rgba(226,31,31,0.08)]"
-              : "bg-white md:bg-white/95 md:backdrop-blur-md border border-red-100/50 shadow-[0_8px_30px_rgb(220,38,38,0.03)]"
+            : "bg-[#E21F1F] border border-red-700/30 shadow-[0_8px_30px_rgba(226,31,31,0.08)]"
         }`}
       >
         <div className="px-6 h-14 md:h-16 flex items-center justify-between">
@@ -47,9 +46,7 @@ export default function Navbar() {
               alt="Layanan Yuk Emblem" 
               className="h-8 w-auto md:h-10 object-contain transition-transform group-hover:scale-105" 
             />
-            <span className={`font-extrabold text-base md:text-lg tracking-tight transition-colors ${
-              isRedNavbar ? "text-white group-hover:text-white/90" : "text-[#E21F1F] group-hover:text-[#b11414]"
-            }`}>
+            <span className="font-extrabold text-base md:text-lg tracking-tight transition-colors text-white group-hover:text-white/90">
               LanggananYuk
             </span>
           </Link>
@@ -61,13 +58,9 @@ export default function Navbar() {
                 key={link.path} 
                 href={link.path}
                 className={`font-semibold text-sm transition-colors py-1 ${
-                  isRedNavbar
-                    ? cleanPath === link.path.replace(/\/$/, "")
-                      ? "text-white border-b-2 border-white"
-                      : "text-white/80 hover:text-white"
-                    : cleanPath === link.path.replace(/\/$/, "")
-                      ? "text-red-600 border-b-2 border-red-600" 
-                      : "text-red-950/70 hover:text-red-600"
+                  cleanPath === link.path.replace(/\/$/, "")
+                    ? "text-white border-b-2 border-white"
+                    : "text-white/80 hover:text-white"
                 }`}
               >
                 {link.name}
@@ -81,11 +74,7 @@ export default function Navbar() {
               href="https://wa.me/6285286502731"
               target="_blank"
               rel="noopener noreferrer"
-              className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm ${
-                isRedNavbar
-                  ? "border border-white bg-transparent text-white hover:bg-white hover:text-[#E21F1F]"
-                  : "bg-red-600 text-white hover:bg-red-700"
-              }`}
+              className="inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm border border-white bg-transparent text-white hover:bg-white hover:text-[#E21F1F]"
             >
               <Send size={12} /> Hubungi CS
             </a>
@@ -94,11 +83,7 @@ export default function Navbar() {
           {/* Mobile Menu Button */}
           <button 
             onClick={() => setIsMenuOpen(!isMenuOpen)}
-            className={`md:hidden p-1.5 rounded-lg transition-colors focus:outline-none ${
-              isRedNavbar
-                ? "text-white bg-red-800/40 hover:bg-red-800/60"
-                : "text-red-600 bg-red-50 hover:bg-red-100"
-            }`}
+            className="md:hidden p-1.5 rounded-lg transition-colors focus:outline-none text-white bg-red-800/40 hover:bg-red-800/60"
             aria-label="Toggle Menu"
           >
             {isMenuOpen ? <X size={18} /> : <Menu size={18} />}
@@ -106,7 +91,7 @@ export default function Navbar() {
 
         </div>
 
-        {/* Mobile Dropdown Menu */}
+        {/* Mobile Dropdown Menu (Fast rendering, solid red background to eliminate mobile GPU lag) */}
         <AnimatePresence>
           {isMenuOpen && (
             <motion.div 
@@ -114,9 +99,7 @@ export default function Navbar() {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -6 }}
               transition={{ duration: 0.12, ease: "easeOut" }}
-              className={`md:hidden border-t ${
-                isRedNavbar ? "border-red-500 bg-[#E21F1F]" : "border-red-50 bg-white"
-              } rounded-b-2xl`}
+              className="md:hidden border-t border-red-500 bg-[#E21F1F] rounded-b-2xl"
             >
               <div className="px-6 py-4 flex flex-col gap-3">
                 {links.map((link) => (
@@ -125,13 +108,9 @@ export default function Navbar() {
                     href={link.path}
                     onClick={() => setIsMenuOpen(false)}
                     className={`font-bold text-sm py-2 transition-colors ${
-                      isRedNavbar
-                        ? cleanPath === link.path.replace(/\/$/, "")
-                          ? "text-white pl-2 border-l-2 border-white"
-                          : "text-white/80 hover:text-white"
-                        : cleanPath === link.path.replace(/\/$/, "")
-                          ? "text-red-600 pl-2 border-l-2 border-red-600" 
-                          : "text-red-950/70 hover:text-red-600"
+                      cleanPath === link.path.replace(/\/$/, "")
+                        ? "text-white pl-2 border-l-2 border-white"
+                        : "text-white/80 hover:text-white"
                     }`}
                   >
                     {link.name}
@@ -142,11 +121,7 @@ export default function Navbar() {
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsMenuOpen(false)}
-                  className={`flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-colors shadow-sm mt-2 ${
-                    isRedNavbar
-                      ? "bg-white text-[#E21F1F] hover:bg-red-50"
-                      : "bg-red-600 text-white hover:bg-red-700"
-                  }`}
+                  className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-colors shadow-sm mt-2 bg-white text-[#E21F1F] hover:bg-red-50"
                 >
                   <Send size={14} /> Hubungi CS Online
                 </a>
