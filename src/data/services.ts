@@ -13,8 +13,7 @@ export const services = [
     id: "claude",
     name: "Claude Pro",
     category: "AI",
-    // Menggunakan logo Anthropic sebagai representasi Claude
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/6/6c/Claude_AI_logo.svg", 
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Claude_AI_logo.svg", 
     originalPrice: 350000,
     sharedPrice: 70000,
     totalSlots: 5,

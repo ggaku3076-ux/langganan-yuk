@@ -21,25 +21,27 @@ export default function LayananPage() {
             transition={{ delay: index * 0.03, duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
             whileHover={{ y: -6, scale: 1.015 }}
             whileTap={{ scale: 0.985 }}
+            className="h-full"
           >
             <Link 
               href={`/checkout/${service.id}`}
-              className="group block bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-shadow duration-200 hover:shadow-lg relative overflow-hidden h-full"
+              className="group flex flex-col justify-between bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-all duration-200 hover:shadow-lg relative overflow-hidden h-full"
             >
-              <div className="h-16 sm:h-20 flex items-center justify-center mb-4 sm:mb-6 w-full p-1 sm:p-2">
-                <img 
-                  src={service.logoUrl} 
-                  alt={`Logo ${service.name}`} 
-                  className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                  onError={(e) => {
-                    e.currentTarget.style.display = 'none';
-                    e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                  }}
-                />
-                <span className="hidden font-bold text-base sm:text-xl text-red-950">{service.name}</span>
+              <div>
+                <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1">
+                  <img 
+                    src={service.logoUrl} 
+                    alt={`Logo ${service.name}`} 
+                    className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                  />
+                </div>
+                
+                <h3 className="font-extrabold text-sm sm:text-base text-red-950 mb-3 tracking-tight group-hover:text-red-600 transition-colors">
+                  {service.name}
+                </h3>
               </div>
               
-              <div className="mt-4 pt-4 border-t border-red-50">
+              <div className="mt-auto pt-4 border-t border-red-50">
                 <p className="text-[10px] sm:text-xs text-red-400 font-semibold line-through mb-0.5 sm:mb-1">
                   {formatRupiah(service.originalPrice)}
                 </p>

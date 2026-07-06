@@ -71,7 +71,7 @@ export default function Navbar() {
           {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
             <a 
-              href="https://wa.me/628123456789"
+              href="https://wa.me/6285286502731"
               target="_blank"
               rel="noopener noreferrer"
               className={`inline-flex items-center gap-1.5 px-5 py-2.5 text-xs font-bold rounded-xl transition-all shadow-sm ${
@@ -131,7 +131,7 @@ export default function Navbar() {
                   </Link>
                 ))}
                 <a 
-                  href="https://wa.me/628123456789"
+                  href="https://wa.me/6285286502731"
                   target="_blank"
                   rel="noopener noreferrer"
                   onClick={() => setIsMenuOpen(false)}

@@ -82,17 +82,18 @@ export default function Home() {
                   href={`/checkout/${service.id}`}
                   className="group flex flex-col justify-between h-full bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-shadow duration-200 hover:shadow-xl"
                 >
-                  <div className="h-16 sm:h-20 flex items-center justify-center mb-4 sm:mb-6 w-full p-1 sm:p-2">
-                    <img 
-                      src={service.logoUrl} 
-                      alt={`Logo ${service.name}`} 
-                      className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
-                      onError={(e) => {
-                        e.currentTarget.style.display = 'none';
-                        e.currentTarget.nextElementSibling?.classList.remove('hidden');
-                      }}
-                    />
-                    <span className="hidden font-bold text-base sm:text-xl text-red-950">{service.name}</span>
+                  <div>
+                    <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1">
+                      <img 
+                        src={service.logoUrl} 
+                        alt={`Logo ${service.name}`} 
+                        className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
+                      />
+                    </div>
+                    
+                    <h3 className="font-extrabold text-sm sm:text-base text-red-950 mb-3 tracking-tight group-hover:text-red-600 transition-colors">
+                      {service.name}
+                    </h3>
                   </div>
                   
                   <div className="mt-auto pt-4 border-t border-red-50">
@@ -195,38 +196,6 @@ export default function Home() {
         </div>
       </section>
 
-      {/* FOOTER */}
-      <footer className="bg-red-950 text-red-100 py-12 border-t border-red-900 mt-auto">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div>
-            <h4 className="font-bold text-white text-lg mb-4">Langganan Yuk</h4>
-            <p className="text-xs text-red-200/80 font-semibold leading-relaxed">
-              Platform patungan premium nomor satu di Indonesia. Menyediakan akses Netflix, Spotify, Claude, dan ChatGPT Premium dengan harga hemat bulanan.
-            </p>
-          </div>
-          <div>
-            <h4 className="font-bold text-white text-sm mb-4">Navigasi Halaman</h4>
-            <div className="grid grid-cols-2 gap-2 text-xs font-semibold">
-              <Link href="/" className="hover:text-white transition-colors">Home</Link>
-              <Link href="/layanan" className="hover:text-white transition-colors">Katalog Layanan</Link>
-              <Link href="/faq" className="hover:text-white transition-colors">Tanya Jawab (FAQ)</Link>
-              <Link href="/contact" className="hover:text-white transition-colors">Hubungi Kami</Link>
-            </div>
-          </div>
-          <div>
-            <h4 className="font-bold text-white text-sm mb-4">Layanan Populer</h4>
-            <div className="flex flex-wrap gap-2">
-              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Patungan Netflix Premium</span>
-              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Spotify Family Murah</span>
-              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Akun Claude Pro</span>
-              <span className="text-[10px] font-bold bg-red-900/50 px-2 py-1 rounded-md text-red-200">Patungan ChatGPT Plus</span>
-            </div>
-          </div>
-        </div>
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 border-t border-red-900/60 mt-8 pt-6 text-center text-xs text-red-300 font-semibold">
-          <p>© 2026 Langganan Yuk. All Rights Reserved. Seluruh hak cipta dilindungi undang-undang.</p>
-        </div>
-      </footer>
     </div>
   );
 }

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,9 +33,11 @@ export default function RootLayout({
           {children}
         </main>
         
-        {/* Floating Action Button - WhatsApp (Original Brand Icon) */}
+        <Footer />
+        
+        {/* Floating Action Button - WhatsApp (Updated CS Number) */}
         <a 
-          href="https://wa.me/628123456789" 
+          href="https://wa.me/6285286502731" 
           target="_blank" 
           rel="noopener noreferrer"
           className="fixed bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white p-4 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 z-50 flex items-center justify-center group border-2 border-red-200"
