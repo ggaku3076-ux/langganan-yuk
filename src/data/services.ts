@@ -13,7 +13,7 @@ export const services = [
     id: "claude",
     name: "Claude Pro",
     category: "AI",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/e/ee/Claude_AI_logo.svg", 
+    logoUrl: "/claude-logo.svg", 
     originalPrice: 350000,
     sharedPrice: 70000,
     totalSlots: 5,

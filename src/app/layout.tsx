@@ -17,6 +17,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Langganan Yuk - Patungan Akun Premium",
   description: "Platform SaaS untuk patungan layanan berlangganan premium.",
+  icons: {
+    icon: "/favicon.ico?v=2",
+  }
 };
 
 export default function RootLayout({
