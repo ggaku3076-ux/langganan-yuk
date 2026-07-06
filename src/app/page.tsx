@@ -57,7 +57,7 @@ export default function Home() {
               >
                 <Link 
                   href={`/checkout/${service.id}`}
-                  className="group flex flex-col justify-between h-full bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1 active:scale-98"
+                  className="group flex flex-col justify-between h-full bg-white rounded-2xl md:rounded-3xl border border-red-100 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 md:hover:border-red-600 md:hover:shadow-xl md:hover:-translate-y-1"
                 >
                   <div>
                     <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1">

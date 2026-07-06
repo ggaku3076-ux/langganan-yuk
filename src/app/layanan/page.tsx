@@ -19,7 +19,7 @@ export default function LayananPage() {
           >
             <Link 
               href={`/checkout/${service.id}`}
-              className="group flex flex-col justify-between bg-white rounded-2xl md:rounded-3xl border border-red-100 hover:border-red-600 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 hover:shadow-xl hover:-translate-y-1 relative overflow-hidden h-full"
+              className="group flex flex-col justify-between bg-white rounded-2xl md:rounded-3xl border border-red-100 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 md:hover:border-red-600 md:hover:shadow-xl md:hover:-translate-y-1 relative overflow-hidden h-full"
             >
               <div>
                 <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1">

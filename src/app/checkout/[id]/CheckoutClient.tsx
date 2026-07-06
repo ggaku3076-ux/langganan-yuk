@@ -6,6 +6,32 @@ import { CheckCircle2, AlertCircle, QrCode, ArrowLeft, Loader2, User, UserPlus }
 import { formatRupiah } from "@/data/services";
 import Link from "next/link";
 
+// Helper function to generate groups statically
+const generateMockGroups = (slots: number, serviceName: string) => [
+  { 
+    id: `grup-a`, 
+    name: `Grup ${serviceName} #${slots === 2 ? "204" : slots === 5 ? "504" : "104"}`, 
+    filled: slots - 1, 
+    total: slots, 
+    status: "hampir-penuh", 
+    slots: Array.from({ length: slots }, (_, i) => ({
+      name: i < slots - 1 ? `Anggota ${i + 1}` : "Kosong",
+      occupied: i < slots - 1
+    })) 
+  },
+  { 
+    id: `grup-b`, 
+    name: `Grup ${serviceName} #${slots === 2 ? "205" : slots === 5 ? "505" : "105"}`, 
+    filled: 1, 
+    total: slots, 
+    status: "tersedia", 
+    slots: Array.from({ length: slots }, (_, i) => ({
+      name: i === 0 ? "Anggota 1" : "Kosong",
+      occupied: i === 0
+    })) 
+  }
+];
+
 export default function CheckoutClient({ service }: { service: any }) {
   const [appState, setAppState] = useState("checkout"); // checkout, payment, waiting
   const [name, setName] = useState("");
@@ -15,47 +41,27 @@ export default function CheckoutClient({ service }: { service: any }) {
   const [isLoading, setIsLoading] = useState(false);
 
   // State untuk opsi paket patungan (misal: 2 User, 4 User, 5 User)
-  const [selectedOption, setSelectedOption] = useState<any>(
+  const [selectedOption, setSelectedOption] = useState<any>(() => 
     service.options ? service.options.find((o: any) => o.isDefault) || service.options[0] : null
   );
 
   const currentPrice = selectedOption ? selectedOption.price : service.sharedPrice;
   const currentSlots = selectedOption ? selectedOption.slots : service.totalSlots;
 
-  // State untuk grup patungan dinamis
-  const [groups, setGroups] = useState<any[]>([]);
-  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  // Initialize group states directly to prevent double-renders on mount
+  const [groups, setGroups] = useState<any[]>(() => 
+    generateMockGroups(selectedOption ? selectedOption.slots : service.totalSlots, service.name)
+  );
+  const [selectedGroup, setSelectedGroup] = useState<any>(() => 
+    generateMockGroups(selectedOption ? selectedOption.slots : service.totalSlots, service.name)[0]
+  );
 
-  // Inisialisasi/update grup patungan berdasarkan slot yang dipilih
+  // Update groups ONLY when the selectedOption changes post-mount
   useEffect(() => {
-    const slots = currentSlots;
-    const mockGroups = [
-      { 
-        id: `grup-a`, 
-        name: `Grup ${service.name} #${slots === 2 ? "204" : slots === 5 ? "504" : "104"}`, 
-        filled: slots - 1, 
-        total: slots, 
-        status: "hampir-penuh", 
-        slots: Array.from({ length: slots }, (_, i) => ({
-          name: i < slots - 1 ? `Anggota ${i + 1}` : "Kosong",
-          occupied: i < slots - 1
-        })) 
-      },
-      { 
-        id: `grup-b`, 
-        name: `Grup ${service.name} #${slots === 2 ? "205" : slots === 5 ? "505" : "105"}`, 
-        filled: 1, 
-        total: slots, 
-        status: "tersedia", 
-        slots: Array.from({ length: slots }, (_, i) => ({
-          name: i === 0 ? "Anggota 1" : "Kosong",
-          occupied: i === 0
-        })) 
-      }
-    ];
+    const mockGroups = generateMockGroups(currentSlots, service.name);
     setGroups(mockGroups);
     setSelectedGroup(mockGroups[0]);
-  }, [selectedOption, service]);
+  }, [selectedOption]);
 
   useEffect(() => {
     let timer: any;
@@ -85,7 +91,7 @@ export default function CheckoutClient({ service }: { service: any }) {
   return (
     <div className="flex-1 py-8 md:py-12 px-4 sm:px-6 bg-red-50/10">
       
-      {/* CHECKOUT STATE (Rendered natively for 0ms lag on mobile) */}
+      {/* CHECKOUT STATE */}
       {appState === "checkout" && (
         <div className="max-w-3xl mx-auto">
           <Link href="/" className="inline-flex items-center gap-2 text-red-700 font-bold mb-6 hover:text-red-600 transition-colors group">
