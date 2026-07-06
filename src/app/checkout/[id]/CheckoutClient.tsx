@@ -130,7 +130,7 @@ export default function CheckoutClient({ service }: { service: any }) {
             {service.options && (
               <div className="mb-6 pb-6 border-b border-red-100">
                 <h3 className="text-sm sm:text-base font-bold text-red-950 mb-3">Pilih Opsi Patungan</h3>
-                <div className="grid grid-cols-3 gap-3">
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                   {service.options.map((opt: any) => {
                     const isSelected = selectedOption?.id === opt.id;
                     return (

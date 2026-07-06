@@ -58,11 +58,17 @@ export const services: Service[] = [
     name: "ChatGPT Plus",
     category: "AI",
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/04/ChatGPT_logo.svg",
-    originalPrice: 350000,
-    sharedPrice: 87500,
+    originalPrice: 360000,
+    sharedPrice: 100000,
     totalSlots: 4,
     filledSlots: 1,
-    description: "Akses ke GPT-4o, GPT-4, serta alat bantu DALL-E untuk membuat gambar, analisis data, browsing web, voice mode tingkat lanjut, dan custom GPTs."
+    description: "Akses GPT-5.2 Thinking reasoning model terbaru, Web browsing, code interpreter & data analysis, Image Generate DALL-E & Video Generate Sora AI, Custom GPTs, plugins & memory (Up to 100 messages/3 jam).",
+    options: [
+      { id: "2-user", label: "2 User", price: 200000, slots: 2 },
+      { id: "3-user", label: "3 User", price: 130000, slots: 3 },
+      { id: "4-user", label: "4 User", price: 100000, slots: 4, isDefault: true },
+      { id: "6-user", label: "6 User", price: 70000, slots: 6 }
+    ]
   },
   {
     id: "spotify",
