@@ -27,19 +27,24 @@ export default function Navbar() {
             : "bg-white/95 backdrop-blur-md border border-red-100/50 shadow-[0_8px_30px_rgb(220,38,38,0.03)]"
         }`}
       >
-        <div className="px-6 h-16 md:h-20 flex items-center justify-between">
+        <div className="px-6 h-18 md:h-22 flex items-center justify-between">
           
-          {/* Logo (Original logo.png layout) */}
+          {/* Logo + Brand Name (Enlarged and aligned next to each other) */}
           <Link 
             href="/" 
-            className="flex items-center cursor-pointer group"
+            className="flex items-center gap-2.5 md:gap-3.5 cursor-pointer group"
             onClick={() => setIsMenuOpen(false)}
           >
             <img 
-              src="/logo.png" 
-              alt="Layanan Yuk Logo" 
-              className="h-10 w-auto md:h-12 object-contain rounded-lg shadow-sm group-hover:scale-105 transition-transform" 
+              src="/logo-emblem.png" 
+              alt="Layanan Yuk Emblem" 
+              className="h-12 w-auto md:h-16 object-contain transition-transform group-hover:scale-105" 
             />
+            <span className={`font-black text-xl md:text-2xl tracking-tighter transition-colors ${
+              isHome ? "text-white group-hover:text-white/90" : "text-[#E21F1F] group-hover:text-[#b11414]"
+            }`}>
+              LanggananYuk
+            </span>
           </Link>
           
           {/* Desktop Navigation Links */}
@@ -63,7 +68,7 @@ export default function Navbar() {
             ))}
           </nav>
 
-          {/* CTA Button (Back to the Right Side) */}
+          {/* CTA Button */}
           <div className="hidden md:flex items-center gap-4">
             <a 
               href="https://wa.me/628123456789"
