@@ -6,62 +6,56 @@ import { CheckCircle2, AlertCircle, QrCode, ArrowLeft, Loader2, User, UserPlus }
 import { formatRupiah } from "@/data/services";
 import Link from "next/link";
 
-const MOCK_NETFLIX_GROUPS = [
-  { 
-    id: "grup-104", 
-    name: "Grup Netflix #104", 
-    filled: 3, 
-    total: 4, 
-    status: "hampir-penuh", 
-    slots: [
-      { name: "Budi S.", occupied: true },
-      { name: "Siti A.", occupied: true },
-      { name: "Andi R.", occupied: true },
-      { name: "Kosong", occupied: false }
-    ] 
-  },
-  { 
-    id: "grup-105", 
-    name: "Grup Netflix #105", 
-    filled: 1, 
-    total: 4, 
-    status: "tersedia", 
-    slots: [
-      { name: "Joko W.", occupied: true },
-      { name: "Kosong", occupied: false },
-      { name: "Kosong", occupied: false },
-      { name: "Kosong", occupied: false }
-    ] 
-  },
-  { 
-    id: "grup-103", 
-    name: "Grup Netflix #103", 
-    filled: 4, 
-    total: 4, 
-    status: "full", 
-    slots: [
-      { name: "Rian H.", occupied: true },
-      { name: "Dewi K.", occupied: true },
-      { name: "Eko P.", occupied: true },
-      { name: "Maya S.", occupied: true }
-    ] 
-  },
-];
-
 export default function CheckoutClient({ service }: { service: any }) {
-  const isNetflix = service.id === "netflix";
-  
   const [appState, setAppState] = useState("checkout"); // checkout, payment, waiting
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
   const [isLoading, setIsLoading] = useState(false);
-  
-  // State khusus grup Netflix
-  const [selectedGroup, setSelectedGroup] = useState<any>(
-    isNetflix ? MOCK_NETFLIX_GROUPS[0] : null
+
+  // State untuk opsi paket patungan (misal: 2 User, 4 User, 5 User)
+  const [selectedOption, setSelectedOption] = useState<any>(
+    service.options ? service.options.find((o: any) => o.isDefault) || service.options[0] : null
   );
+
+  const currentPrice = selectedOption ? selectedOption.price : service.sharedPrice;
+  const currentSlots = selectedOption ? selectedOption.slots : service.totalSlots;
+
+  // State untuk grup patungan dinamis
+  const [groups, setGroups] = useState<any[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+
+  // Inisialisasi/update grup patungan berdasarkan slot yang dipilih
+  useEffect(() => {
+    const slots = currentSlots;
+    const mockGroups = [
+      { 
+        id: `grup-a`, 
+        name: `Grup ${service.name} #${slots === 2 ? "204" : slots === 5 ? "504" : "104"}`, 
+        filled: slots - 1, 
+        total: slots, 
+        status: "hampir-penuh", 
+        slots: Array.from({ length: slots }, (_, i) => ({
+          name: i < slots - 1 ? `Anggota ${i + 1}` : "Kosong",
+          occupied: i < slots - 1
+        })) 
+      },
+      { 
+        id: `grup-b`, 
+        name: `Grup ${service.name} #${slots === 2 ? "205" : slots === 5 ? "505" : "105"}`, 
+        filled: 1, 
+        total: slots, 
+        status: "tersedia", 
+        slots: Array.from({ length: slots }, (_, i) => ({
+          name: i === 0 ? "Anggota 1" : "Kosong",
+          occupied: i === 0
+        })) 
+      }
+    ];
+    setGroups(mockGroups);
+    setSelectedGroup(mockGroups[0]);
+  }, [selectedOption, service]);
 
   useEffect(() => {
     let timer: any;
@@ -109,7 +103,7 @@ export default function CheckoutClient({ service }: { service: any }) {
             <div className="bg-white p-5 sm:p-8 md:p-10 rounded-3xl border border-red-100 shadow-xl shadow-red-900/5">
               
               {/* Header Layanan */}
-              <div className="flex flex-col md:flex-row items-start md:items-center gap-5 mb-8 pb-8 border-b border-red-100">
+              <div className="flex flex-col md:flex-row items-start md:items-center gap-5 mb-6 pb-6 border-b border-red-100">
                 <div className="h-16 w-24 sm:h-20 sm:w-28 flex items-center justify-center p-2.5 sm:p-3 bg-white border border-red-100 rounded-2xl shadow-sm">
                    <img 
                     src={service.logoUrl} 
@@ -120,100 +114,133 @@ export default function CheckoutClient({ service }: { service: any }) {
                 <div>
                   <h2 className="text-xl sm:text-2xl font-bold text-red-950 tracking-tight mb-1">{service.name}</h2>
                   <div className="flex items-center gap-2">
-                    <p className="text-red-600 font-bold text-lg sm:text-xl">{formatRupiah(service.sharedPrice)}</p>
+                    <p className="text-red-600 font-bold text-lg sm:text-xl">{formatRupiah(currentPrice)}</p>
                     <span className="px-2 py-0.5 bg-red-50 text-red-700 font-semibold text-[10px] sm:text-xs rounded-full">Per Bulan</span>
                   </div>
                 </div>
               </div>
 
-              {/* KHUSUS NETFLIX: PILIHAN GRUP */}
-              {isNetflix && (
-                <div className="mb-8 pb-8 border-b border-red-100">
-                  <h3 className="text-sm sm:text-base font-bold text-red-950 mb-4">
-                    Pilih Grup Patungan Aktif
-                  </h3>
-                  
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 sm:gap-4 mb-6">
-                    {MOCK_NETFLIX_GROUPS.map((group) => {
-                      const isFull = group.status === "full";
-                      const isChosen = selectedGroup?.id === group.id;
-                      
+              {/* Deskripsi Layanan / Fitur */}
+              {service.description && (
+                <div className="mb-6 p-4 bg-red-50/40 rounded-2xl border border-red-50/80 text-xs sm:text-sm text-red-900 leading-relaxed font-medium">
+                  <strong className="text-red-950 block mb-1">Fitur Utama:</strong>
+                  {service.description}
+                </div>
+              )}
+
+              {/* OPSI PAKET PATUNGAN */}
+              {service.options && (
+                <div className="mb-6 pb-6 border-b border-red-100">
+                  <h3 className="text-sm sm:text-base font-bold text-red-950 mb-3">Pilih Opsi Patungan</h3>
+                  <div className="grid grid-cols-3 gap-3">
+                    {service.options.map((opt: any) => {
+                      const isSelected = selectedOption?.id === opt.id;
                       return (
-                        <div
-                          key={group.id}
-                          onClick={() => !isFull && setSelectedGroup(group)}
-                          className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
-                            isFull 
-                              ? "bg-red-50/20 border-red-100 opacity-60 cursor-not-allowed" 
-                              : isChosen
-                                ? "bg-red-50 border-red-600 ring-2 ring-red-600/10 cursor-pointer"
-                                : "bg-white border-red-100 hover:border-red-300 cursor-pointer"
+                        <button
+                          key={opt.id}
+                          type="button"
+                          onClick={() => setSelectedOption(opt)}
+                          className={`p-3 rounded-xl border text-center transition-all cursor-pointer ${
+                            isSelected
+                              ? "bg-red-50 border-red-600 ring-2 ring-red-600/10"
+                              : "bg-white border-red-100 hover:border-red-300"
                           }`}
                         >
-                          <div className="flex justify-between items-center mb-2.5">
-                            <span className="text-xs sm:text-sm font-bold text-red-950">{group.name}</span>
-                            <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold ${
-                              isFull 
-                                ? "bg-red-100 text-red-800" 
-                                : group.status === "hampir-penuh"
-                                  ? "bg-red-600 text-white animate-pulse"
-                                  : "bg-red-100 text-red-700"
-                            }`}>
-                              {isFull ? "Full" : `${group.filled}/${group.total}`}
-                            </span>
-                          </div>
-
-                          {/* Visualisasi Slot */}
-                          <div className="flex gap-1.5">
-                            {group.slots.map((slot, i) => (
-                              <div 
-                                key={i} 
-                                className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border text-[8px] sm:text-[10px] font-bold ${
-                                  slot.occupied 
-                                    ? "bg-red-600 border-red-600 text-white" 
-                                    : "border-dashed border-red-300 text-red-300 bg-white"
-                                }`}
-                                title={slot.name}
-                              >
-                                {slot.occupied ? <User size={8} /> : <UserPlus size={8} />}
-                              </div>
-                            ))}
-                          </div>
-                        </div>
+                          <p className="text-xs sm:text-sm font-bold text-red-950">{opt.label}</p>
+                          <p className="text-[10px] sm:text-xs text-red-600 font-bold mt-0.5">{formatRupiah(opt.price)}</p>
+                        </button>
                       );
                     })}
                   </div>
-
-                  {/* Detail Slot */}
-                  {selectedGroup && (
-                    <div className="bg-red-50/50 p-4 sm:p-5 rounded-2xl border border-red-100">
-                      <p className="text-[10px] sm:text-xs font-bold text-red-800 uppercase tracking-wider mb-3">Detail Anggota {selectedGroup.name}</p>
-                      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
-                        {selectedGroup.slots.map((slot: any, i: number) => {
-                          const isOccupied = slot.occupied;
-                          const showPreviewName = !isOccupied && name;
-                          
-                          return (
-                            <div key={i} className="flex items-center gap-2 bg-white px-2.5 py-2 rounded-xl border border-red-100 min-w-0">
-                              <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                                isOccupied || showPreviewName ? "bg-red-600 text-white" : "bg-red-50 text-red-300"
-                              }`}>
-                                <User size={12} />
-                              </div>
-                              <div className="min-w-0 flex-1">
-                                <p className="text-[9px] sm:text-[10px] text-red-400 font-semibold">Slot {i+1}</p>
-                                <p className="text-xs font-bold text-red-950 truncate">
-                                  {isOccupied ? slot.name : showPreviewName ? `${name} (Anda)` : "Kosong"}
-                                </p>
-                              </div>
-                            </div>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  )}
                 </div>
               )}
+
+              {/* PILIHAN GRUP */}
+              <div className="mb-8 pb-8 border-b border-red-100">
+                <h3 className="text-sm sm:text-base font-bold text-red-950 mb-4">
+                  Pilih Grup Patungan Aktif
+                </h3>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+                  {groups.map((group) => {
+                    const isFull = group.filled === group.total;
+                    const isChosen = selectedGroup?.id === group.id;
+                    
+                    return (
+                      <div
+                        key={group.id}
+                        onClick={() => !isFull && setSelectedGroup(group)}
+                        className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
+                          isFull 
+                            ? "bg-red-50/20 border-red-100 opacity-60 cursor-not-allowed" 
+                            : isChosen
+                              ? "bg-red-50 border-red-600 ring-2 ring-red-600/10 cursor-pointer"
+                              : "bg-white border-red-100 hover:border-red-300 cursor-pointer"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center mb-2.5">
+                          <span className="text-xs sm:text-sm font-bold text-red-950">{group.name}</span>
+                          <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold ${
+                            isFull 
+                              ? "bg-red-100 text-red-800" 
+                              : group.status === "hampir-penuh"
+                                ? "bg-red-600 text-white animate-pulse"
+                                : "bg-red-100 text-red-700"
+                          }`}>
+                            {isFull ? "Full" : `${group.filled}/${group.total}`}
+                          </span>
+                        </div>
+
+                        {/* Visualisasi Slot */}
+                        <div className="flex gap-1.5">
+                          {group.slots.map((slot: any, i: number) => (
+                            <div 
+                              key={i} 
+                              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border text-[8px] sm:text-[10px] font-bold ${
+                                slot.occupied 
+                                  ? "bg-red-600 border-red-600 text-white" 
+                                  : "border-dashed border-red-300 text-red-300 bg-white"
+                              }`}
+                              title={slot.name}
+                            >
+                              {slot.occupied ? <User size={8} /> : <UserPlus size={8} />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Detail Slot */}
+                {selectedGroup && (
+                  <div className="bg-red-50/50 p-4 sm:p-5 rounded-2xl border border-red-100">
+                    <p className="text-[10px] sm:text-xs font-bold text-red-800 uppercase tracking-wider mb-3">Detail Anggota {selectedGroup.name}</p>
+                    <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+                      {selectedGroup.slots.map((slot: any, i: number) => {
+                        const isOccupied = slot.occupied;
+                        const showPreviewName = !isOccupied && name;
+                        
+                        return (
+                          <div key={i} className="flex items-center gap-2 bg-white px-2.5 py-2 rounded-xl border border-red-100 min-w-0">
+                            <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                              isOccupied || showPreviewName ? "bg-red-600 text-white" : "bg-red-50 text-red-300"
+                            }`}>
+                              <User size={12} />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="text-[9px] sm:text-[10px] text-red-400 font-semibold">Slot {i+1}</p>
+                              <p className="text-xs font-bold text-red-950 truncate">
+                                {isOccupied ? slot.name : showPreviewName ? `${name} (Anda)` : "Kosong"}
+                              </p>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
 
               {/* Form Checkout */}
               <div className="space-y-5">
@@ -303,7 +330,7 @@ export default function CheckoutClient({ service }: { service: any }) {
               
               <div className="mb-6 sm:mb-8">
                 <p className="text-[10px] sm:text-xs text-red-700 font-bold mb-1 uppercase tracking-wider">Total Tagihan</p>
-                <p className="text-2xl sm:text-3xl font-bold text-red-600">{formatRupiah(service.sharedPrice)}</p>
+                <p className="text-2xl sm:text-3xl font-bold text-red-600">{formatRupiah(currentPrice)}</p>
               </div>
 
               <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-4 rounded-full mb-6 sm:mb-8 mx-auto border border-red-100 w-auto max-w-full">
