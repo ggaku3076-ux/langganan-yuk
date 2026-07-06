@@ -110,7 +110,6 @@ export default function Navbar() {
                 {links.map((link) => (
                   <Link 
                     key={link.path} 
-                    toggleMenu={() => setIsMenuOpen(false)}
                     href={link.path}
                     onClick={() => setIsMenuOpen(false)}
                     className={`font-bold text-sm py-2 transition-colors ${
