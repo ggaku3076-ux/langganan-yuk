@@ -29,7 +29,7 @@ export default function Navbar() {
       >
         <div className="px-6 h-16 md:h-20 flex items-center justify-between">
           
-          {/* Logo */}
+          {/* Logo (Original logo.png layout) */}
           <Link 
             href="/" 
             className="flex items-center cursor-pointer group"

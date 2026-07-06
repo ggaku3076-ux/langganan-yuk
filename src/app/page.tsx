@@ -4,12 +4,11 @@ import Link from "next/link";
 import { ShieldCheck, Zap, Users, ArrowRight, HelpCircle, CheckCircle2, Info } from "lucide-react";
 import { services, formatRupiah } from "@/data/services";
 import { motion } from "framer-motion";
-import ScrollVelocity from "@/components/ScrollVelocity";
 
 export default function Home() {
   return (
     <div className="w-full flex flex-col">
-      {/* SECTION 1: HERO SECTION (Exact Matching background color #E21F1F to remove seam) */}
+      {/* SECTION 1: HERO SECTION (Compact Height, Styled Background Fit) */}
       <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.png')] bg-[length:auto_85%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 md:pt-36">
         {/* Dark overlay for better readability on small screens */}
         <div className="absolute inset-0 bg-[#E21F1F]/20 md:bg-transparent pointer-events-none" />
@@ -58,9 +57,6 @@ export default function Home() {
           </div>
         </div>
       </section>
-
-      {/* VELOCITY SCROLL BANNER (Reacts to user scroll speed) */}
-      <ScrollVelocity />
 
       {/* SECTION 2: CATALOG SECTION (White Background, Red-Bordered Cards) */}
       <section className="bg-white py-16 md:py-24 border-t border-red-50">
