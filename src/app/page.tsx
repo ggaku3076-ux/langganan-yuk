@@ -8,10 +8,10 @@ import { motion } from "framer-motion";
 export default function Home() {
   return (
     <div className="w-full flex flex-col">
-      {/* SECTION 1: HERO SECTION (Compact Height, Styled Background Fit) */}
-      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.png')] bg-[length:auto_85%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 md:pt-36">
+      {/* SECTION 1: HERO SECTION (Mobile Optimized Spacing) */}
+      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.png')] bg-[length:auto_55%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12">
         {/* Dark overlay for better readability on small screens */}
-        <div className="absolute inset-0 bg-[#E21F1F]/20 md:bg-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-[#E21F1F]/10 md:bg-transparent pointer-events-none" />
         
         <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <div className="max-w-2xl text-left flex flex-col items-start">
@@ -123,7 +123,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 3: HOW IT WORKS */}
+      {/* SECTION 3: HOW IT WORKS (Optimized vertical alignment on mobile) */}
       <section className="bg-red-950 text-white py-16 md:py-20 border-t border-red-900">
         <div className="max-w-5xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 md:mb-16">
@@ -145,9 +145,9 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05, duration: 0.4 }}
                 whileHover={{ scale: 1.02 }}
-                className="bg-red-900/40 p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-red-800 flex md:flex-col items-center md:text-center gap-4 md:gap-0"
+                className="bg-red-900/40 p-5 sm:p-6 rounded-xl sm:rounded-2xl border border-red-800 flex items-start md:items-center md:text-center gap-4 md:gap-0"
               >
-                <div className="w-8 h-8 rounded-full bg-white text-red-950 font-bold text-sm flex items-center justify-center flex-shrink-0 md:mb-4">{step.num}</div>
+                <div className="w-8 h-8 rounded-full bg-white text-red-950 font-bold text-sm flex items-center justify-center flex-shrink-0 mt-0.5 md:mt-0 md:mb-4">{step.num}</div>
                 <div>
                   <h4 className="text-sm font-bold text-white mb-1 md:mb-2 text-left md:text-center">{step.title}</h4>
                   <p className="text-xs text-red-200 font-medium leading-relaxed text-left md:text-center">{step.desc}</p>
@@ -158,7 +158,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* SECTION 4: SEO ARTICLES */}
+      {/* SECTION 4: SEO ARTICLES (Optimized vertical alignment on mobile) */}
       <section className="py-16 md:py-24 bg-red-50/30 border-t border-red-100">
         <div className="max-w-4xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-12 md:mb-16">
@@ -180,9 +180,9 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ delay: idx * 0.05, duration: 0.4 }}
                 whileHover={{ y: -3 }}
-                className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-red-100 shadow-sm flex gap-4"
+                className="bg-white p-5 sm:p-8 rounded-2xl sm:rounded-3xl border border-red-100 shadow-sm flex items-start gap-4"
               >
-                <div className="p-2.5 bg-red-50 rounded-xl text-red-600 flex-shrink-0 h-10 w-10 flex items-center justify-center border border-red-100">
+                <div className="p-2.5 bg-red-50 rounded-xl text-red-600 flex-shrink-0 h-10 w-10 flex items-center justify-center border border-red-100 mt-0.5">
                   {article.icon}
                 </div>
                 <div>

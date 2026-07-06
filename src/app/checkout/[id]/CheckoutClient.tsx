@@ -241,9 +241,10 @@ export default function CheckoutClient({ service }: { service: any }) {
                     placeholder="08123456789"
                     className="w-full px-4 py-3 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-sm sm:text-base"
                   />
-                  <p className="text-[10px] sm:text-xs text-red-700 mt-2 flex items-center gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
-                    <AlertCircle size={12} className="text-red-600 flex-shrink-0" /> Akun premium akan dikirim ke nomor ini via WA.
-                  </p>
+                  <div className="text-[10px] sm:text-xs text-red-700 mt-2 flex items-start gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
+                    <AlertCircle size={12} className="text-red-600 flex-shrink-0 mt-0.5" /> 
+                    <span>Akun premium akan dikirim ke nomor ini via WA.</span>
+                  </div>
                 </div>
 
                 <div className="flex items-start gap-3 p-4 bg-white border border-red-100 rounded-xl mt-4 cursor-pointer hover:border-red-200 transition-colors" onClick={() => setAgreed(!agreed)}>
@@ -305,9 +306,9 @@ export default function CheckoutClient({ service }: { service: any }) {
                 <p className="text-2xl sm:text-3xl font-bold text-red-600">{formatRupiah(service.sharedPrice)}</p>
               </div>
 
-              <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-5 rounded-full mb-6 sm:mb-8 w-max mx-auto border border-red-100">
-                <AlertCircle size={14} className="text-red-600" />
-                Batas Waktu: <span className="text-red-600 ml-1 font-bold">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span>
+              <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-4 rounded-full mb-6 sm:mb-8 mx-auto border border-red-100 w-auto max-w-full">
+                <AlertCircle size={14} className="text-red-600 flex-shrink-0" />
+                <span>Batas Waktu: <span className="text-red-600 font-bold">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span></span>
               </div>
 
               <button 
