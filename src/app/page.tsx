@@ -8,43 +8,57 @@ import { motion } from "framer-motion";
 export default function Home() {
   return (
     <div className="w-full flex flex-col">
-      {/* SECTION 1: HERO SECTION */}
-      <section className="bg-red-600 text-white py-16 md:py-24 relative overflow-hidden">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center relative z-10">
-          <motion.h1 
-            initial={{ opacity: 0, y: -15 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-            className="text-4xl sm:text-5xl md:text-7xl font-bold tracking-tight mb-6 sm:mb-8 leading-[1.2] md:leading-[1.15]"
-          >
-            Patungan Layanan Premium <br/>
-            <span className="underline decoration-white decoration-2 md:decoration-4 underline-offset-4 md:underline-offset-8">
-              Aman & Tanpa Beban
-            </span>
-          </motion.h1>
-          
-          <motion.p 
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.15, duration: 0.5 }}
-            className="text-base sm:text-lg md:text-xl text-red-100 max-w-2xl mx-auto font-semibold leading-relaxed mb-8 md:mb-12"
-          >
-            Nikmati akses akun premium favorit Anda secara legal dengan sistem patungan otomatis. Hemat pengeluaran bulanan Anda hingga 80%.
-          </motion.p>
+      {/* SECTION 1: HERO SECTION (Matching Desktop Prototype Structure and Background) */}
+      <section className="w-full bg-red-600 bg-[url('/hero-bg.png')] bg-cover bg-no-repeat bg-center md:bg-right min-h-[600px] md:min-h-[750px] flex items-center relative py-12 pt-36 md:pt-44">
+        {/* Dark overlay for better readability on small screens */}
+        <div className="absolute inset-0 bg-red-600/30 md:bg-transparent pointer-events-none" />
+        
+        <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
+          <div className="max-w-2xl text-left flex flex-col items-start">
+            
+            {/* Paragraph above heading */}
+            <motion.p 
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.1, duration: 0.4 }}
+              className="text-white text-sm sm:text-base md:text-lg font-semibold leading-relaxed mb-6 max-w-xl"
+            >
+              Nikmati akses akun premium favorit Anda secara legal dengan sistem patungan otomatis. Hemat pengeluaran bulanan Anda hingga 80%
+            </motion.p>
 
-          {/* Centered Features inside Hero */}
-          <div className="flex flex-wrap justify-center gap-3 text-xs sm:text-sm font-bold text-red-600 mt-4 sm:mt-6">
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-1.5 bg-white px-4 py-2.5 rounded-xl shadow-md border border-white cursor-default"><ShieldCheck className="text-red-600 w-4.5 h-4.5" /> Garansi Aman</motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-1.5 bg-white px-4 py-2.5 rounded-xl shadow-md border border-white cursor-default"><Zap className="text-red-600 w-4.5 h-4.5" /> Akun Instan</motion.div>
-            <motion.div whileHover={{ scale: 1.03 }} whileTap={{ scale: 0.97 }} className="flex items-center gap-1.5 bg-white px-4 py-2.5 rounded-xl shadow-md border border-white cursor-default"><Users className="text-red-600 w-4.5 h-4.5" /> Matchmaking AI</motion.div>
+            {/* Heading in uppercase, large bold text */}
+            <motion.h1 
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+              className="text-4xl sm:text-6xl md:text-8xl font-extrabold tracking-tighter text-white uppercase leading-[1.0] mb-10 font-sans"
+            >
+              Patungan <br/>
+              Premium Aman <br/>
+              Tanpa Beban
+            </motion.h1>
+            
+            {/* REGISTER NOW Button */}
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.4 }}
+              whileHover={{ scale: 1.05 }} 
+              whileTap={{ scale: 0.95 }}
+            >
+              <Link 
+                href="/layanan" 
+                className="inline-block px-10 py-5 bg-white text-red-600 font-bold text-sm sm:text-base tracking-wider rounded-none uppercase hover:bg-red-50 transition-colors shadow-lg"
+              >
+                Register Now
+              </Link>
+            </motion.div>
+
           </div>
         </div>
-        
-        {/* Asymmetrical design accent */}
-        <div className="absolute bottom-0 right-0 w-24 h-24 md:w-32 md:h-32 bg-red-700 rounded-tl-full opacity-50 pointer-events-none" />
       </section>
 
-      {/* SECTION 2: CATALOG SECTION (Framer-Motion Hover/Tap Physics) */}
+      {/* SECTION 2: CATALOG SECTION (White Background, Red-Bordered Cards) */}
       <section className="bg-white py-16 md:py-24 border-t border-red-50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6">
           <div className="text-center mb-10 md:mb-16">
