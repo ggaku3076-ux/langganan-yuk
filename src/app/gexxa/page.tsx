@@ -128,6 +128,7 @@ export default function AdminDashboard() {
   const [groupsList, setGroupsList] = useState<any[]>([]);
   const [selectedServiceForGroups, setSelectedServiceForGroups] = useState<string>("netflix");
   const [groupsLoading, setGroupsLoading] = useState(false);
+  const [isSendingWa, setIsSendingWa] = useState(false);
 
   // Check authentication status on mount & hide global layout components
   useEffect(() => {
@@ -1065,14 +1066,40 @@ export default function AdminDashboard() {
                 Batalkan
               </button>
               <button
-                onClick={() => {
-                  alert(`Pesanan akun premium sukses dikirim via WhatsApp ke ${selectedTrx.whatsapp}!`);
-                  setShowCredentialsModal(false);
+                onClick={async () => {
+                  setIsSendingWa(true);
+                  try {
+                    const msgText = `Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${services.find(s => s.id === selectedTrx.serviceId)?.name} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: netflix-indo-premium43@gmail.com\n- Password: IndoPrem332!\n- Profil Penggunaan: Profil 4 / User 4\n- PIN Profil: 9912\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`;
+                    const response = await fetch("/api/admin/send-wa", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": "Bearer raihan9898"
+                      },
+                      body: JSON.stringify({
+                        target: selectedTrx.whatsapp,
+                        message: msgText
+                      })
+                    });
+                    const data = await response.json();
+                    if (response.ok) {
+                      alert(`Kredensial berhasil dikirim via WhatsApp ke ${selectedTrx.whatsapp}!`);
+                      setShowCredentialsModal(false);
+                    } else {
+                      alert(`Gagal mengirim WA: ${data.error}`);
+                    }
+                  } catch (err) {
+                    console.error("Error sending WA:", err);
+                    alert("Gagal mengirim WhatsApp. Pastikan token Fonnte aktif.");
+                  } finally {
+                    setIsSendingWa(false);
+                  }
                 }}
-                className="w-1/2 bg-red-600 hover:bg-red-700 text-white border border-red-700 font-bold py-2.5 rounded-2xl text-xs shadow-lg shadow-red-600/10 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                disabled={isSendingWa}
+                className="w-1/2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white border border-red-700 font-bold py-2.5 rounded-2xl text-xs shadow-lg shadow-red-600/10 cursor-pointer transition-all flex items-center justify-center gap-1.5"
               >
                 <Send size={14} />
-                Kirim via Fonnte API
+                {isSendingWa ? "Mengirim..." : "Kirim via Fonnte API"}
               </button>
             </div>
           </div>

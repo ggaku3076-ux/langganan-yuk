@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { sendWhatsApp } from "@/lib/fonnte";
+import { services, formatRupiah } from "@/data/services";
 
 export const dynamic = "force-dynamic";
 
@@ -60,6 +62,14 @@ export async function POST(req: NextRequest) {
     if (insertErr) {
       return NextResponse.json({ error: insertErr.message }, { status: 550 });
     }
+
+    // Send WhatsApp notification for PENDING transaction via Fonnte
+    const svcName = services.find(s => s.id === serviceId)?.name || serviceId;
+    const waMessage = `Halo ${name},\n\nPesanan patungan *${svcName}* (${optionLabel}) Anda telah berhasil dibuat.\n\n*ID Invoice:* ${transactionId}\n*Status:* PENDING (Menunggu Pembayaran)\n*Total Tagihan:* ${formatRupiah(price)}\n\nSilakan lakukan pembayaran sesuai QRIS yang tertera di halaman checkout untuk bergabung ke grup patungan.\n\nTerima kasih,\nLanggananYuk Support`;
+    
+    sendWhatsApp(whatsapp, waMessage).catch((err) =>
+      console.error("Error sending checkout WA:", err)
+    );
 
     // 4. Return the generated transaction and simulated QRIS payload
     // In production with Midtrans, we would return the real QRIS url/string here.

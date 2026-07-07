@@ -269,11 +269,6 @@ export default function CheckoutClient({ service }: { service: any }) {
                 <h3 className="text-sm sm:text-base font-bold text-red-950">
                   Pilih Grup Patungan Aktif
                 </h3>
-                {groupsLoading && (
-                  <span className="text-[10px] text-red-650 font-bold animate-pulse flex items-center gap-1">
-                    <Loader2 size={10} className="animate-spin" /> Menghubungkan...
-                  </span>
-                )}
               </div>
               
               {groupsError ? (
@@ -293,7 +288,7 @@ export default function CheckoutClient({ service }: { service: any }) {
                     <RefreshCw size={10} /> Coba Lagi
                   </button>
                 </div>
-              ) : groupsLoading ? (
+              ) : groupsLoading && groups.length === 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   {Array.from({ length: 2 }).map((_, i) => (
                     <div key={i} className="p-4 bg-red-50/20 border border-red-100/50 rounded-2xl animate-pulse space-y-3">
