@@ -60,7 +60,25 @@ export async function GET(req: NextRequest) {
       groups = [newGroup];
     }
 
-    return NextResponse.json({ groups });
+    // 3. Fetch all active transactions (SUCCESS & PENDING) for these groups
+    const groupIds = groups.map(g => g.id);
+    const { data: transactions } = await supabaseAdmin
+      .from("transactions")
+      .select("buyer_name, status, timestamp, group_id")
+      .in("group_id", groupIds)
+      .in("status", ["SUCCESS", "PENDING"])
+      .order("timestamp", { ascending: true });
+
+    // 4. Map transactions to their respective groups
+    const groupsWithTrx = groups.map(g => {
+      const groupTrxs = transactions ? transactions.filter(t => t.group_id === g.id) : [];
+      return {
+        ...g,
+        transactions: groupTrxs
+      };
+    });
+
+    return NextResponse.json({ groups: groupsWithTrx });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }

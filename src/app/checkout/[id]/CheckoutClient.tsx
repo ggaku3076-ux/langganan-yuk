@@ -52,23 +52,49 @@ export default function CheckoutClient({ service }: { service: any }) {
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
   const [createdTransaction, setCreatedTransaction] = useState<any>(null);
 
+  const maskName = (rawName: string) => {
+    if (!rawName) return "Kosong";
+    const parts = rawName.split(" ");
+    return parts.map(part => {
+      if (part.length <= 1) return part;
+      return part[0] + "*".repeat(part.length - 1);
+    }).join(" ");
+  };
+
   const fetchGroups = async () => {
     try {
       const response = await fetch(`/api/groups?serviceId=${service.id}&slots=${currentSlots}`);
       if (response.ok) {
         const data = await response.json();
         if (data.groups) {
-          const formattedGroups = data.groups.map((g: any) => ({
-            id: g.id,
-            name: `Grup ${service.name} #${g.group_number}`,
-            filled: g.filled_slots,
-            total: g.max_slots,
-            status: g.filled_slots >= g.max_slots - 1 ? "hampir-penuh" : "tersedia",
-            slots: Array.from({ length: g.max_slots }, (_, i) => ({
-              name: i < g.filled_slots ? `Anggota ${i + 1}` : "Kosong",
-              occupied: i < g.filled_slots
-            }))
-          }));
+          const formattedGroups = data.groups.map((g: any) => {
+            const trxs = g.transactions || [];
+            const slots = Array.from({ length: g.max_slots }, (_, i) => {
+              const tx = trxs[i];
+              if (tx) {
+                return {
+                  name: maskName(tx.buyer_name),
+                  occupied: true,
+                  status: tx.status
+                };
+              }
+              return {
+                name: "Kosong",
+                occupied: false,
+                status: null
+              };
+            });
+
+            return {
+              id: g.id,
+              name: `Grup ${service.name} #${g.group_number}`,
+              filled: trxs.filter((t: any) => t.status === "SUCCESS").length,
+              pending: trxs.filter((t: any) => t.status === "PENDING").length,
+              total: g.max_slots,
+              status: trxs.length >= g.max_slots - 1 ? "hampir-penuh" : "tersedia",
+              slots
+            };
+          });
           setGroups(formattedGroups);
           setSelectedGroup(formattedGroups[0] || null);
         }
@@ -234,7 +260,7 @@ export default function CheckoutClient({ service }: { service: any }) {
               
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
                 {groups.map((group) => {
-                  const isFull = group.filled === group.total;
+                  const isFull = group.filled >= group.total;
                   const isChosen = selectedGroup?.id === group.id;
                   
                   return (
@@ -269,7 +295,9 @@ export default function CheckoutClient({ service }: { service: any }) {
                             key={i} 
                             className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border text-[8px] sm:text-[10px] font-bold ${
                               slot.occupied 
-                                ? "bg-red-600 border-red-600 text-white" 
+                                ? slot.status === "PENDING"
+                                  ? "bg-amber-500 border-amber-500 text-white"
+                                  : "bg-red-600 border-red-600 text-white"
                                 : "border-dashed border-red-300 text-red-300 bg-white"
                             }`}
                             title={slot.name}
@@ -295,12 +323,23 @@ export default function CheckoutClient({ service }: { service: any }) {
                       return (
                         <div key={i} className="flex items-center gap-2 bg-white px-2.5 py-2 rounded-xl border border-red-100 min-w-0">
                           <div className={`w-6 h-6 sm:w-8 sm:h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                            isOccupied || showPreviewName ? "bg-red-600 text-white" : "bg-red-50 text-red-300"
+                            isOccupied 
+                              ? slot.status === "PENDING"
+                                ? "bg-amber-500 text-white animate-pulse"
+                                : "bg-red-600 text-white"
+                              : showPreviewName 
+                                ? "bg-red-600 text-white" 
+                                : "bg-red-50 text-red-300"
                           }`}>
                             <User size={12} />
                           </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="text-[9px] sm:text-[10px] text-red-400 font-semibold">Slot {i+1}</p>
+                           <div className="min-w-0 flex-1">
+                            <div className="flex items-center justify-between gap-1">
+                              <p className="text-[9px] sm:text-[10px] text-red-400 font-semibold">Slot {i+1}</p>
+                              {isOccupied && slot.status === "PENDING" && (
+                                <span className="bg-amber-50 text-amber-600 text-[8px] px-1 rounded font-black border border-amber-100 animate-pulse">PENDING</span>
+                              )}
+                            </div>
                             <p className="text-xs font-bold text-red-950 truncate">
                               {isOccupied ? slot.name : showPreviewName ? `${name} (Anda)` : "Kosong"}
                             </p>
