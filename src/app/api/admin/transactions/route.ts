@@ -30,7 +30,20 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: error.message }, { status: 500 });
     }
 
-    return NextResponse.json({ transactions });
+    const formatted = (transactions || []).map((t: any) => ({
+      id: t.id,
+      name: t.buyer_name,
+      whatsapp: t.whatsapp_number,
+      serviceId: t.service_id,
+      optionLabel: t.option_label,
+      price: Number(t.price),
+      status: t.status,
+      timestamp: t.timestamp ? new Date(t.timestamp).toISOString().replace('T', ' ').substring(0, 16) : "",
+      groupId: t.group_id,
+      referenceId: t.reference_id || ""
+    }));
+
+    return NextResponse.json({ transactions: formatted });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
