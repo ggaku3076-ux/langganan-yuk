@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
+export const dynamic = "force-dynamic";
+
 // Helper to generate a random uppercase alphanumeric string
 function generateRandomId(prefix: string, length: number) {
   const chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";

@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 
+export const dynamic = "force-dynamic";
+
 // Simple authorization check helper
 function isAuthorized(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
