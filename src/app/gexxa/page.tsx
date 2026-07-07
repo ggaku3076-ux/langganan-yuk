@@ -148,6 +148,31 @@ export default function AdminDashboard() {
     };
   }, []);
 
+  const fetchTransactions = async () => {
+    try {
+      const response = await fetch("/api/admin/transactions", {
+        headers: {
+          "Authorization": "Bearer raihan9898"
+        }
+      });
+      if (response.ok) {
+        const data = await response.json();
+        if (data.transactions) {
+          setTransactions(data.transactions);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching transactions:", err);
+    }
+  };
+
+  // Fetch transactions once authenticated
+  useEffect(() => {
+    if (isAuthenticated) {
+      fetchTransactions();
+    }
+  }, [isAuthenticated]);
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (username === "gexxa" && password === "raihan9898") {
@@ -166,26 +191,51 @@ export default function AdminDashboard() {
     setPassword("");
   };
 
-  const handleRefresh = () => {
+  const handleRefresh = async () => {
     setIsRefreshing(true);
-    setTimeout(() => {
-      setIsRefreshing(false);
-    }, 800);
+    await fetchTransactions();
+    setIsRefreshing(false);
   };
 
-  const handleDeleteTrx = (id: string) => {
+  const handleDeleteTrx = async (id: string) => {
     if (confirm("Apakah Anda yakin ingin menghapus data transaksi ini?")) {
-      setTransactions(transactions.filter(t => t.id !== id));
+      try {
+        const response = await fetch(`/api/admin/transactions?id=${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": "Bearer raihan9898"
+          }
+        });
+        if (response.ok) {
+          setTransactions(transactions.filter(t => t.id !== id));
+        }
+      } catch (err) {
+        console.error("Error deleting transaction:", err);
+      }
     }
   };
 
-  const handleUpdateStatus = (id: string, newStatus: "PENDING" | "SUCCESS" | "EXPIRED") => {
-    setTransactions(transactions.map(t => {
-      if (t.id === id) {
-        return { ...t, status: newStatus };
+  const handleUpdateStatus = async (id: string, newStatus: "PENDING" | "SUCCESS" | "EXPIRED") => {
+    try {
+      const response = await fetch("/api/admin/transactions", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer raihan9898"
+        },
+        body: JSON.stringify({ id, status: newStatus })
+      });
+      if (response.ok) {
+        setTransactions(transactions.map(t => {
+          if (t.id === id) {
+            return { ...t, status: newStatus };
+          }
+          return t;
+        }));
       }
-      return t;
-    }));
+    } catch (err) {
+      console.error("Error updating status:", err);
+    }
   };
 
   const handleOpenCredentials = (trx: Transaction) => {
