@@ -121,8 +121,13 @@ export default function AdminDashboard() {
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
 
-  // Tab state: "transactions" | "inventory"
-  const [activeTab, setActiveTab] = useState<"transactions" | "inventory">("transactions");
+  // Tab state: "transactions" | "grup" | "inventory"
+  const [activeTab, setActiveTab] = useState<"transactions" | "grup" | "inventory">("transactions");
+
+  // Groups tab states
+  const [groupsList, setGroupsList] = useState<any[]>([]);
+  const [selectedServiceForGroups, setSelectedServiceForGroups] = useState<string>("netflix");
+  const [groupsLoading, setGroupsLoading] = useState(false);
 
   // Check authentication status on mount & hide global layout components
   useEffect(() => {
@@ -169,10 +174,35 @@ export default function AdminDashboard() {
     }
   };
 
-  // Fetch transactions once authenticated
+  const fetchGroupsList = async () => {
+    setGroupsLoading(true);
+    try {
+      const response = await fetch("/api/admin/groups", {
+        headers: {
+          "Authorization": "Bearer raihan9898"
+        }
+      });
+      const data = await response.json();
+      if (response.ok) {
+        if (data.groups) {
+          setGroupsList(data.groups);
+        }
+      } else {
+        alert(`Gagal mengambil data grup: ${data.error || "Gagal otentikasi admin."}`);
+      }
+    } catch (err: any) {
+      console.error("Error fetching groups:", err);
+      alert("Gagal menghubungi API grup.");
+    } finally {
+      setGroupsLoading(false);
+    }
+  };
+
+  // Fetch data once authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchTransactions();
+      fetchGroupsList();
     }
   }, [isAuthenticated]);
 
@@ -196,7 +226,7 @@ export default function AdminDashboard() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await fetchTransactions();
+    await Promise.all([fetchTransactions(), fetchGroupsList()]);
     setIsRefreshing(false);
   };
 
@@ -400,6 +430,17 @@ export default function AdminDashboard() {
             Daftar Transaksi
           </button>
           <button 
+            onClick={() => setActiveTab("grup")}
+            className={`py-4 px-6 font-black text-xs uppercase tracking-wider border-b-4 transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === "grup" 
+                ? "border-red-600 text-red-600" 
+                : "border-transparent text-slate-500 hover:text-red-950"
+            }`}
+          >
+            <Users size={15} />
+            Grup & Anggota
+          </button>
+          <button 
             onClick={() => setActiveTab("inventory")}
             className={`py-4 px-6 font-black text-xs uppercase tracking-wider border-b-4 transition-all cursor-pointer flex items-center gap-2 ${
               activeTab === "inventory" 
@@ -460,7 +501,7 @@ export default function AdminDashboard() {
           </div>
         </section>
 
-        {activeTab === "transactions" ? (
+        {activeTab === "transactions" && (
           /* TAB 1: TRANSACTIONS LOGS */
           <section className="bg-white border border-red-100 rounded-3xl shadow-sm overflow-hidden">
             <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -663,7 +704,239 @@ export default function AdminDashboard() {
               </table>
             </div>
           </section>
-        ) : (
+        )}
+
+        {activeTab === "grup" && (
+          <section className="space-y-6 animate-fadeIn">
+            {/* 4 Cards for 4 Services */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {services.map((svc) => {
+                const serviceGroups = groupsList.filter(g => g.service_id === svc.id);
+                const isActive = selectedServiceForGroups === svc.id;
+                return (
+                  <button
+                    key={svc.id}
+                    onClick={() => setSelectedServiceForGroups(svc.id)}
+                    className={`p-5 rounded-2xl border text-left transition-all cursor-pointer flex items-center gap-4 ${
+                      isActive
+                        ? "bg-red-50 border-red-600 ring-2 ring-red-600/10 shadow-md"
+                        : "bg-white border-red-100 hover:border-red-300 shadow-sm"
+                    }`}
+                  >
+                    <div className="w-12 h-12 bg-white rounded-xl border border-red-100 flex items-center justify-center p-2">
+                      <img src={svc.logoUrl} alt={svc.name} className="w-full h-full object-contain" />
+                    </div>
+                    <div>
+                      <h3 className="font-black text-red-950 text-sm sm:text-base leading-tight">{svc.name}</h3>
+                      <p className="text-xs text-red-600 font-bold mt-1">
+                        {serviceGroups.length} Grup Terdaftar
+                      </p>
+                    </div>
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* List of Groups for Selected Service */}
+            <div className="space-y-8">
+              {groupsList.filter(g => g.service_id === selectedServiceForGroups).length === 0 ? (
+                <div className="bg-white border border-red-100 rounded-3xl p-12 text-center text-slate-400 font-bold">
+                  <Users size={48} className="mx-auto text-slate-300 mb-3" />
+                  <p>Belum ada grup yang terdaftar untuk layanan ini.</p>
+                </div>
+              ) : (
+                groupsList
+                  .filter(g => g.service_id === selectedServiceForGroups)
+                  .sort((a, b) => a.group_number - b.group_number)
+                  .map((group) => {
+                    const svc = services.find(s => s.id === group.service_id);
+                    const trxs = group.transactions || [];
+                    const slots = Array.from({ length: group.max_slots }, (_, i) => {
+                      const tx = trxs[i];
+                      return tx ? {
+                        id: tx.id,
+                        name: tx.buyer_name,
+                        whatsapp: tx.whatsapp_number,
+                        status: tx.status,
+                        price: tx.price,
+                        timestamp: tx.timestamp ? new Date(tx.timestamp).toISOString().replace('T', ' ').substring(0, 16) : "",
+                        optionLabel: tx.option_label,
+                        occupied: true
+                      } : {
+                        id: null,
+                        name: "Slot Kosong",
+                        whatsapp: "",
+                        status: "KOSONG",
+                        price: 0,
+                        timestamp: "",
+                        optionLabel: "",
+                        occupied: false
+                      };
+                    });
+
+                    return (
+                      <div key={group.id} className="bg-white border border-red-100 rounded-3xl shadow-sm overflow-hidden">
+                        {/* Group Header */}
+                        <div className="p-5 bg-slate-50 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <span className="bg-red-600 text-white text-xs font-black px-2.5 py-1 rounded-lg">
+                              Grup #{group.group_number}
+                            </span>
+                            <div>
+                              <h3 className="font-black text-red-950 text-sm sm:text-base">
+                                {svc?.name} - {group.id}
+                              </h3>
+                              <p className="text-[10px] text-slate-500 font-bold">
+                                Dibuat pada: {group.created_at ? new Date(group.created_at).toLocaleDateString("id-ID") : "-"}
+                              </p>
+                            </div>
+                          </div>
+
+                          <div className="flex items-center gap-2">
+                            <span className="text-xs font-bold text-slate-500">
+                              Isi Slot: {trxs.filter((t: any) => t.status === "SUCCESS").length} / {group.max_slots} Lunas
+                            </span>
+                            {group.status === "full" || trxs.filter((t: any) => t.status === "SUCCESS").length >= group.max_slots ? (
+                              <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
+                                Penuh (FULL)
+                              </span>
+                            ) : (
+                              <span className="bg-amber-50 border border-amber-200 text-amber-700 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm animate-pulse">
+                                Menunggu Anggota
+                              </span>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Slots Table */}
+                        <div className="overflow-x-auto w-full">
+                          <table className="w-full text-left border-collapse">
+                            <thead>
+                              <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-black bg-slate-50/50">
+                                <th className="py-3 px-6 w-20">Slot</th>
+                                <th className="py-3 px-6">ID Invoice</th>
+                                <th className="py-3 px-6">Nama Anggota</th>
+                                <th className="py-3 px-6">WhatsApp</th>
+                                <th className="py-3 px-6">Total Tagihan</th>
+                                <th className="py-3 px-6">Status Bayar</th>
+                                <th className="py-3 px-6 text-center">Aksi / Kontrol</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 text-xs">
+                              {slots.map((slot, idx) => (
+                                <tr key={idx} className={`hover:bg-slate-50/50 transition-colors ${!slot.occupied ? "text-slate-400 italic bg-slate-50/20" : ""}`}>
+                                  <td className="py-4 px-6 font-black text-red-950">
+                                    #{idx + 1}
+                                  </td>
+                                  <td className="py-4 px-6">
+                                    {slot.occupied ? (
+                                      <span className="font-black text-red-950 tracking-tight">{slot.id}</span>
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </td>
+                                  <td className="py-4 px-6">
+                                    <span className={slot.occupied ? "font-black text-slate-900" : ""}>
+                                      {slot.name}
+                                    </span>
+                                  </td>
+                                  <td className="py-4 px-6">
+                                    {slot.occupied ? (
+                                      <a 
+                                        href={`https://wa.me/${slot.whatsapp.replace(/^0/, '62')}`}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                        className="text-[10px] text-emerald-600 hover:underline flex items-center gap-0.5 font-black"
+                                      >
+                                        <Smartphone size={10} />
+                                        {slot.whatsapp}
+                                      </a>
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </td>
+                                  <td className="py-4 px-6">
+                                    {slot.occupied ? (
+                                      <span className="font-black text-red-950">{formatRupiah(slot.price)}</span>
+                                    ) : (
+                                      "-"
+                                    )}
+                                  </td>
+                                  <td className="py-4 px-6">
+                                    {slot.status === "SUCCESS" && (
+                                      <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
+                                        Lunas (SUCCESS)
+                                      </span>
+                                    )}
+                                    {slot.status === "PENDING" && (
+                                      <span className="bg-amber-50 border border-amber-200 text-amber-700 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
+                                        Pending (PENDING)
+                                      </span>
+                                    )}
+                                    {slot.status === "KOSONG" && (
+                                      <span className="text-[10px] text-slate-400 font-bold">
+                                        Tersedia
+                                      </span>
+                                    )}
+                                  </td>
+                                  <td className="py-4 px-6 text-center">
+                                    {slot.occupied ? (
+                                      <div className="flex items-center justify-center gap-2">
+                                        {slot.status === "PENDING" && (
+                                          <button
+                                            onClick={() => handleUpdateStatus(slot.id!, "SUCCESS")}
+                                            className="bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-300 hover:border-emerald-600 text-emerald-600 font-black px-2 py-1 rounded-lg text-[10px] transition-all cursor-pointer shadow-sm"
+                                          >
+                                            Set Lunas
+                                          </button>
+                                        )}
+                                        <button
+                                          onClick={() => handleOpenCredentials({
+                                            id: slot.id!,
+                                            name: slot.name,
+                                            whatsapp: slot.whatsapp,
+                                            serviceId: group.service_id,
+                                            optionLabel: slot.optionLabel,
+                                            price: slot.price,
+                                            status: slot.status as any,
+                                            timestamp: slot.timestamp,
+                                            groupId: group.id,
+                                            referenceId: ""
+                                          })}
+                                          disabled={slot.status !== "SUCCESS"}
+                                          className="bg-white hover:bg-red-50 disabled:opacity-30 disabled:pointer-events-none text-red-600 border border-slate-250 hover:border-red-200 font-bold p-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
+                                          title="Kirim Kredensial via WA"
+                                        >
+                                          <Send size={12} />
+                                        </button>
+                                        <button
+                                          onClick={() => handleDeleteTrx(slot.id!)}
+                                          className="bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 hover:border-red-200 border border-slate-250 p-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
+                                          title="Hapus Log"
+                                        >
+                                          <Trash2 size={12} />
+                                        </button>
+                                      </div>
+                                    ) : (
+                                      <span className="text-[10px] text-slate-400 font-bold">
+                                        -
+                                      </span>
+                                    )}
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    );
+                  })
+              )}
+            </div>
+          </section>
+        )}
+
+        {activeTab === "inventory" && (
           /* TAB 2: SERVICE INVENTORY & DATA */
           <section className="space-y-6">
             {/* Catalog Info */}
