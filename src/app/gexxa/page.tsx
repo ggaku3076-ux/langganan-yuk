@@ -23,7 +23,8 @@ import {
   Tag,
   Key,
   FolderOpen,
-  ChevronRight
+  ChevronRight,
+  TrendingUp
 } from "lucide-react";
 import { services, formatRupiah } from "@/data/services";
 
@@ -253,6 +254,29 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleDeleteGroup = async (id: string) => {
+    if (confirm("Apakah Anda yakin ingin menghapus grup ini? Pembeli di dalam grup ini akan dibebaskan (group_id diset null).")) {
+      try {
+        const response = await fetch(`/api/admin/groups?id=${id}`, {
+          method: "DELETE",
+          headers: {
+            "Authorization": "Bearer raihan9898"
+          }
+        });
+        const data = await response.json();
+        if (response.ok) {
+          alert("Grup berhasil dihapus!");
+          await fetchGroupsList();
+        } else {
+          alert(`Gagal menghapus grup: ${data.error}`);
+        }
+      } catch (err) {
+        console.error("Error deleting group:", err);
+        alert("Kesalahan jaringan saat menghapus grup.");
+      }
+    }
+  };
+
   const handleUpdateStatus = async (id: string, newStatus: "PENDING" | "SUCCESS" | "EXPIRED") => {
     try {
       const response = await fetch("/api/admin/transactions", {
@@ -306,6 +330,19 @@ export default function AdminDashboard() {
 
   const pendingCount = transactions.filter(t => t.status === "PENDING").length;
   const successCount = transactions.filter(t => t.status === "SUCCESS").length;
+
+  // Calculate Profit: Total revenue minus cost of subscriptions for active groups
+  const totalCost = groupsList.reduce((sum, group) => {
+    const service = services.find(s => s.id === group.service_id);
+    if (!service) return sum;
+    // Only count cost if group has at least 1 SUCCESS transaction
+    const hasSuccess = group.transactions && group.transactions.some((t: any) => t.status === "SUCCESS");
+    if (hasSuccess) {
+      return sum + service.originalPrice;
+    }
+    return sum;
+  }, 0);
+  const totalProfit = totalSales - totalCost;
 
   if (!isAuthenticated) {
     return (
@@ -490,13 +527,13 @@ export default function AdminDashboard() {
           </div>
 
           <div className="bg-white border border-red-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center justify-center">
-              <Users size={24} />
+            <div className="w-12 h-12 bg-red-50 border border-red-100 text-red-650 rounded-2xl flex items-center justify-center">
+              <TrendingUp size={24} />
             </div>
             <div>
-              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tingkat Konversi</p>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Estimasi Profit</p>
               <h3 className="text-lg sm:text-2xl font-black text-red-950 tracking-tight mt-0.5">
-                {transactions.length > 0 ? Math.round((successCount / transactions.length) * 100) : 0}%
+                {formatRupiah(totalProfit)}
               </h3>
             </div>
           </div>
@@ -793,7 +830,7 @@ export default function AdminDashboard() {
                             </div>
                           </div>
 
-                          <div className="flex items-center gap-2">
+                          <div className="flex items-center gap-3">
                             <span className="text-xs font-bold text-slate-500">
                               Isi Slot: {trxs.filter((t: any) => t.status === "SUCCESS").length} / {group.max_slots} Lunas
                             </span>
@@ -806,6 +843,14 @@ export default function AdminDashboard() {
                                 Menunggu Anggota
                               </span>
                             )}
+                            <button
+                              onClick={() => handleDeleteGroup(group.id)}
+                              className="bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 hover:border-red-250 font-bold p-1.5 rounded-lg transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 text-[10px]"
+                              title="Hapus Grup"
+                            >
+                              <Trash2 size={11} />
+                              Hapus Grup
+                            </button>
                           </div>
                         </div>
 
