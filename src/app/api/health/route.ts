@@ -6,9 +6,12 @@ export const dynamic = "force-dynamic";
 export async function GET(req: NextRequest) {
   const diagnostics: any = {
     env: {
-      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? "Set (OK)" : "Missing",
-      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Set (OK)" : "Missing",
-      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? "Set (OK)" : "Missing",
+      NEXT_PUBLIC_SUPABASE_URL: process.env.NEXT_PUBLIC_SUPABASE_URL ? "Set" : "Missing",
+      SUPABASE_URL: process.env.SUPABASE_URL ? "Set" : "Missing",
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ? "Set" : "Missing",
+      SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? "Set" : "Missing",
+      SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? "Set" : "Missing",
+      SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY ? "Set" : "Missing",
     },
     tables: {}
   };
@@ -46,8 +49,8 @@ export async function GET(req: NextRequest) {
       servicesError || 
       groupsError || 
       transactionsError || 
-      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.SUPABASE_SERVICE_ROLE_KEY;
+      !(process.env.NEXT_PUBLIC_SUPABASE_URL || process.env.SUPABASE_URL) ||
+      !(process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.SUPABASE_SERVICE_KEY);
 
     return NextResponse.json({
       status: hasError ? "Unhealthy" : "Healthy",
