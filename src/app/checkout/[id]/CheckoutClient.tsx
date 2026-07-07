@@ -48,19 +48,38 @@ export default function CheckoutClient({ service }: { service: any }) {
   const currentPrice = selectedOption ? selectedOption.price : service.sharedPrice;
   const currentSlots = selectedOption ? selectedOption.slots : service.totalSlots;
 
-  // Initialize group states directly to prevent double-renders on mount
-  const [groups, setGroups] = useState<any[]>(() => 
-    generateMockGroups(selectedOption ? selectedOption.slots : service.totalSlots, service.name)
-  );
-  const [selectedGroup, setSelectedGroup] = useState<any>(() => 
-    generateMockGroups(selectedOption ? selectedOption.slots : service.totalSlots, service.name)[0]
-  );
+  const [groups, setGroups] = useState<any[]>([]);
+  const [selectedGroup, setSelectedGroup] = useState<any>(null);
+  const [createdTransaction, setCreatedTransaction] = useState<any>(null);
 
-  // Update groups ONLY when the selectedOption changes post-mount
+  const fetchGroups = async () => {
+    try {
+      const response = await fetch(`/api/groups?serviceId=${service.id}&slots=${currentSlots}`);
+      if (response.ok) {
+        const data = await response.json();
+        if (data.groups) {
+          const formattedGroups = data.groups.map((g: any) => ({
+            id: g.id,
+            name: `Grup ${service.name} #${g.group_number}`,
+            filled: g.filled_slots,
+            total: g.max_slots,
+            status: g.filled_slots >= g.max_slots - 1 ? "hampir-penuh" : "tersedia",
+            slots: Array.from({ length: g.max_slots }, (_, i) => ({
+              name: i < g.filled_slots ? `Anggota ${i + 1}` : "Kosong",
+              occupied: i < g.filled_slots
+            }))
+          }));
+          setGroups(formattedGroups);
+          setSelectedGroup(formattedGroups[0] || null);
+        }
+      }
+    } catch (err) {
+      console.error("Error fetching groups:", err);
+    }
+  };
+
   useEffect(() => {
-    const mockGroups = generateMockGroups(currentSlots, service.name);
-    setGroups(mockGroups);
-    setSelectedGroup(mockGroups[0]);
+    fetchGroups();
   }, [selectedOption]);
 
   useEffect(() => {
@@ -71,21 +90,68 @@ export default function CheckoutClient({ service }: { service: any }) {
     return () => clearInterval(timer);
   }, [appState, timeLeft]);
 
-  const handleCheckout = () => {
+  const handleCheckout = async () => {
+    if (!selectedGroup) return;
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          whatsapp,
+          serviceId: service.id,
+          optionLabel: selectedOption ? selectedOption.label : "Shared",
+          price: currentPrice,
+          groupId: selectedGroup.id
+        })
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        if (data.success) {
+          setCreatedTransaction(data.transaction);
+          setTimeLeft(15 * 60);
+          setAppState("payment");
+        }
+      } else {
+        const errData = await response.json();
+        alert(errData.error || "Gagal membuat transaksi");
+      }
+    } catch (err) {
+      console.error("Checkout error:", err);
+      alert("Terjadi kesalahan saat memproses checkout.");
+    } finally {
       setIsLoading(false);
-      setTimeLeft(15 * 60);
-      setAppState("payment");
-    }, 800);
+    }
   };
 
-  const handlePayment = () => {
+  const handlePayment = async () => {
+    if (!createdTransaction) return;
     setIsLoading(true);
-    setTimeout(() => {
+    try {
+      const response = await fetch("/api/admin/transactions", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "Authorization": "Bearer raihan9898"
+        },
+        body: JSON.stringify({
+          id: createdTransaction.id,
+          status: "SUCCESS"
+        })
+      });
+
+      if (response.ok) {
+        setAppState("waiting");
+      } else {
+        alert("Simulasi pembayaran gagal.");
+      }
+    } catch (err) {
+      console.error("Payment confirmation error:", err);
+    } finally {
       setIsLoading(false);
-      setAppState("waiting");
-    }, 1500);
+    }
   };
 
   return (
