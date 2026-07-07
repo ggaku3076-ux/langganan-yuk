@@ -87,6 +87,15 @@ export async function POST(req: NextRequest) {
     }
 
     // 3. Matchmaking Logic: If setting status to SUCCESS, increment group slots
+    if (status === "EXPIRED" && trx.status !== "EXPIRED") {
+      const svcName = services.find(s => s.id === trx.service_id)?.name || trx.service_id;
+      const expiredMessage = `Halo ${trx.buyer_name},\n\nPembayaran Invoice *${trx.id}* untuk patungan *${svcName}* Anda dinyatakan GAGAL / KADALUARSA (EXPIRED). ❌\n\nSilakan lakukan pemesanan ulang di website jika Anda masih berminat untuk bergabung.\n\nTerima kasih,\nLanggananYuk Support`;
+      
+      sendWhatsApp(trx.whatsapp_number, expiredMessage).catch((err) =>
+        console.error("Error sending payment expired WA:", err)
+      );
+    }
+
     if (status === "SUCCESS" && trx.status !== "SUCCESS") {
       const svcName = services.find(s => s.id === trx.service_id)?.name || trx.service_id;
       
