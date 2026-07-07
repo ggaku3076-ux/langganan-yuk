@@ -20,7 +20,7 @@ export async function POST(req: NextRequest) {
     } = body;
 
     if (!order_id || !signature_key || !gross_amount || !status_code) {
-      return NextResponse.json({ error: "Missing required notification fields" }, { status: 400 });
+      return NextResponse.json({ message: "Ping / Validation request received successfully" }, { status: 200 });
     }
 
     // 1. Verify Midtrans Signature Key
