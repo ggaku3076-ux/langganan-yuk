@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
-import { CheckCircle2, AlertCircle, QrCode, ArrowLeft, Loader2, User, UserPlus } from "lucide-react";
+import { CheckCircle2, AlertCircle, QrCode, ArrowLeft, Loader2, User, UserPlus, RefreshCw } from "lucide-react";
 import { formatRupiah } from "@/data/services";
 import Link from "next/link";
 
@@ -51,6 +51,8 @@ export default function CheckoutClient({ service }: { service: any }) {
   const [groups, setGroups] = useState<any[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
   const [createdTransaction, setCreatedTransaction] = useState<any>(null);
+  const [groupsLoading, setGroupsLoading] = useState(true);
+  const [groupsError, setGroupsError] = useState<string | null>(null);
 
   const maskName = (rawName: string) => {
     if (!rawName) return "Kosong";
@@ -62,10 +64,12 @@ export default function CheckoutClient({ service }: { service: any }) {
   };
 
   const fetchGroups = async () => {
+    setGroupsLoading(true);
+    setGroupsError(null);
     try {
       const response = await fetch(`/api/groups?serviceId=${service.id}&slots=${currentSlots}`);
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         if (data.groups) {
           const formattedGroups = data.groups.map((g: any) => {
             const trxs = g.transactions || [];
@@ -97,10 +101,17 @@ export default function CheckoutClient({ service }: { service: any }) {
           });
           setGroups(formattedGroups);
           setSelectedGroup(formattedGroups[0] || null);
+        } else {
+          setGroupsError("Format data grup dari server tidak valid.");
         }
+      } else {
+        setGroupsError(data.error || "Gagal menghubungi database.");
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching groups:", err);
+      setGroupsError("Terjadi kesalahan jaringan saat mengambil data grup.");
+    } finally {
+      setGroupsLoading(false);
     }
   };
 
@@ -254,62 +265,109 @@ export default function CheckoutClient({ service }: { service: any }) {
 
             {/* PILIHAN GRUP */}
             <div className="mb-8 pb-8 border-b border-red-100">
-              <h3 className="text-sm sm:text-base font-bold text-red-950 mb-4">
-                Pilih Grup Patungan Aktif
-              </h3>
+              <div className="flex justify-between items-center mb-4">
+                <h3 className="text-sm sm:text-base font-bold text-red-950">
+                  Pilih Grup Patungan Aktif
+                </h3>
+                {groupsLoading && (
+                  <span className="text-[10px] text-red-650 font-bold animate-pulse flex items-center gap-1">
+                    <Loader2 size={10} className="animate-spin" /> Menghubungkan...
+                  </span>
+                )}
+              </div>
               
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
-                {groups.map((group) => {
-                  const isFull = group.filled >= group.total;
-                  const isChosen = selectedGroup?.id === group.id;
-                  
-                  return (
-                    <div
-                      key={group.id}
-                      onClick={() => !isFull && setSelectedGroup(group)}
-                      className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
-                        isFull 
-                          ? "bg-red-50/20 border-red-100 opacity-60 cursor-not-allowed" 
-                          : isChosen
-                            ? "bg-red-50 border-red-600 ring-2 ring-red-600/10 cursor-pointer"
-                            : "bg-white border-red-100 hover:border-red-300 cursor-pointer"
-                      }`}
-                    >
-                      <div className="flex justify-between items-center mb-2.5">
-                        <span className="text-xs sm:text-sm font-bold text-red-950">{group.name}</span>
-                        <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold ${
-                          isFull 
-                            ? "bg-red-100 text-red-800" 
-                            : group.status === "hampir-penuh"
-                              ? "bg-red-600 text-white animate-pulse"
-                              : "bg-red-100 text-red-700"
-                        }`}>
-                          {isFull ? "Full" : `${group.filled}/${group.total}`}
-                        </span>
+              {groupsError ? (
+                <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl font-semibold space-y-2">
+                  <p className="font-bold flex items-center gap-1.5 text-red-800">
+                    <AlertCircle size={14} className="text-red-650" />
+                    Koneksi database gagal: {groupsError}
+                  </p>
+                  <p className="text-[10px] text-red-650/80 leading-relaxed font-bold">
+                    Pastikan Anda telah mengisi variables URL & Anon Key di Vercel, lalu picu Redeploy.
+                  </p>
+                  <button 
+                    type="button"
+                    onClick={fetchGroups}
+                    className="bg-red-600 hover:bg-red-700 active:scale-95 text-white text-[10px] font-bold px-3 py-1.5 rounded-lg border-2 border-red-750 transition-all cursor-pointer inline-flex items-center gap-1"
+                  >
+                    <RefreshCw size={10} /> Coba Lagi
+                  </button>
+                </div>
+              ) : groupsLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {Array.from({ length: 2 }).map((_, i) => (
+                    <div key={i} className="p-4 bg-red-50/20 border border-red-100/50 rounded-2xl animate-pulse space-y-3">
+                      <div className="flex justify-between items-center">
+                        <div className="w-24 h-4 bg-red-100 rounded"></div>
+                        <div className="w-12 h-4 bg-red-100 rounded-full"></div>
                       </div>
-
-                      {/* Visualisasi Slot */}
                       <div className="flex gap-1.5">
-                        {group.slots.map((slot: any, i: number) => (
-                          <div 
-                            key={i} 
-                            className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border text-[8px] sm:text-[10px] font-bold ${
-                              slot.occupied 
-                                ? slot.status === "PENDING"
-                                  ? "bg-amber-500 border-amber-500 text-white"
-                                  : "bg-red-600 border-red-600 text-white"
-                                : "border-dashed border-red-300 text-red-300 bg-white"
-                            }`}
-                            title={slot.name}
-                          >
-                            {slot.occupied ? <User size={8} /> : <UserPlus size={8} />}
-                          </div>
+                        {Array.from({ length: 4 }).map((_, j) => (
+                          <div key={j} className="w-6 h-6 rounded-full bg-red-100"></div>
                         ))}
                       </div>
                     </div>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
+              ) : groups.length === 0 ? (
+                <p className="text-xs text-slate-500 font-bold text-center py-4 bg-slate-50 rounded-2xl border border-slate-200">
+                  Tidak ada grup patungan aktif.
+                </p>
+              ) : (
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-6">
+                  {groups.map((group) => {
+                    const isFull = group.filled >= group.total;
+                    const isChosen = selectedGroup?.id === group.id;
+                    
+                    return (
+                      <div
+                        key={group.id}
+                        onClick={() => !isFull && setSelectedGroup(group)}
+                        className={`p-3.5 sm:p-4 rounded-2xl border transition-all ${
+                          isFull 
+                            ? "bg-red-50/20 border-red-100 opacity-60 cursor-not-allowed" 
+                            : isChosen
+                              ? "bg-red-50 border-red-600 ring-2 ring-red-600/10 cursor-pointer"
+                              : "bg-white border-red-100 hover:border-red-300 cursor-pointer"
+                        }`}
+                      >
+                        <div className="flex justify-between items-center mb-2.5">
+                          <span className="text-xs sm:text-sm font-bold text-red-950">{group.name}</span>
+                          <span className={`text-[10px] sm:text-xs px-2 py-0.5 rounded-full font-bold ${
+                            isFull 
+                              ? "bg-red-100 text-red-800" 
+                              : group.status === "hampir-penuh"
+                                ? "bg-red-600 text-white animate-pulse"
+                                : "bg-red-100 text-red-700"
+                          }`}>
+                            {isFull ? "Full" : `${group.filled}/${group.total}`}
+                          </span>
+                        </div>
+
+                        {/* Visualisasi Slot */}
+                        <div className="flex gap-1.5">
+                          {group.slots.map((slot: any, i: number) => (
+                            <div 
+                              key={i} 
+                              className={`w-5 h-5 sm:w-6 sm:h-6 rounded-full flex items-center justify-center border text-[8px] sm:text-[10px] font-bold ${
+                                slot.occupied 
+                                  ? slot.status === "PENDING"
+                                    ? "bg-amber-500 border-amber-500 text-white"
+                                    : "bg-red-600 border-red-600 text-white"
+                                  : "border-dashed border-red-300 text-red-300 bg-white"
+                              }`}
+                              title={slot.name}
+                            >
+                              {slot.occupied ? <User size={8} /> : <UserPlus size={8} />}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
 
               {/* Detail Slot */}
               {selectedGroup && (
@@ -350,7 +408,6 @@ export default function CheckoutClient({ service }: { service: any }) {
                   </div>
                 </div>
               )}
-            </div>
 
             {/* Form Checkout */}
             <div className="space-y-5">

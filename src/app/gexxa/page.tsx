@@ -155,14 +155,17 @@ export default function AdminDashboard() {
           "Authorization": "Bearer raihan9898"
         }
       });
+      const data = await response.json();
       if (response.ok) {
-        const data = await response.json();
         if (data.transactions) {
           setTransactions(data.transactions);
         }
+      } else {
+        alert(`Gagal mengambil data dari Supabase: ${data.error || "Gagal otentikasi admin."}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error fetching transactions:", err);
+      alert("Gagal menghubungi API transaksi. Pastikan koneksi internet aktif dan server Vercel Anda online.");
     }
   };
 
@@ -206,11 +209,15 @@ export default function AdminDashboard() {
             "Authorization": "Bearer raihan9898"
           }
         });
+        const data = await response.json();
         if (response.ok) {
           setTransactions(transactions.filter(t => t.id !== id));
+        } else {
+          alert(`Gagal menghapus transaksi dari database: ${data.error || "Akses ditolak."}`);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("Error deleting transaction:", err);
+        alert("Terjadi kesalahan jaringan saat menghapus transaksi.");
       }
     }
   };
@@ -225,6 +232,7 @@ export default function AdminDashboard() {
         },
         body: JSON.stringify({ id, status: newStatus })
       });
+      const data = await response.json();
       if (response.ok) {
         setTransactions(transactions.map(t => {
           if (t.id === id) {
@@ -232,9 +240,12 @@ export default function AdminDashboard() {
           }
           return t;
         }));
+      } else {
+        alert(`Gagal memperbarui status transaksi: ${data.error || "Akses ditolak."}`);
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error("Error updating status:", err);
+      alert("Terjadi kesalahan jaringan saat memperbarui status.");
     }
   };
 
