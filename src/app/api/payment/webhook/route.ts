@@ -6,10 +6,27 @@ import { sendWhatsApp } from "@/lib/fonnte";
 
 export const dynamic = "force-dynamic";
 
+// GET /api/payment/webhook: Simple health check / ping verification
+export async function GET(req: NextRequest) {
+  return NextResponse.json({ message: "Webhook endpoint is active and listening." }, { status: 200 });
+}
+
 // POST /api/payment/webhook: Midtrans Webhook Notification
 export async function POST(req: NextRequest) {
   try {
-    const body = await req.json();
+    const rawBody = await req.text();
+    if (!rawBody) {
+      return NextResponse.json({ message: "Empty body ping received" }, { status: 200 });
+    }
+
+    let body;
+    try {
+      body = JSON.parse(rawBody);
+    } catch (e) {
+      console.warn("Received non-JSON POST request, treating as validation ping.");
+      return NextResponse.json({ message: "Validation request received successfully" }, { status: 200 });
+    }
+
     const {
       order_id,
       transaction_status,
