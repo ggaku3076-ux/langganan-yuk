@@ -51,6 +51,7 @@ export default function CheckoutClient({ service }: { service: any }) {
   const [groups, setGroups] = useState<any[]>([]);
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
   const [createdTransaction, setCreatedTransaction] = useState<any>(null);
+  const [midtransRedirectUrl, setMidtransRedirectUrl] = useState<string | null>(null);
   const [groupsLoading, setGroupsLoading] = useState(true);
   const [groupsError, setGroupsError] = useState<string | null>(null);
 
@@ -154,8 +155,12 @@ export default function CheckoutClient({ service }: { service: any }) {
         const data = await response.json();
         if (data.success) {
           setCreatedTransaction(data.transaction);
+          setMidtransRedirectUrl(data.redirectUrl || null);
           setTimeLeft(15 * 60);
           setAppState("payment");
+          if (data.redirectUrl) {
+            window.open(data.redirectUrl, "_blank");
+          }
         }
       } else {
         const errData = await response.json();
@@ -478,21 +483,39 @@ export default function CheckoutClient({ service }: { service: any }) {
             <div className="absolute top-0 left-0 w-full h-1 bg-red-600" />
             
             <h2 className="text-xl sm:text-2xl font-bold mb-1.5 text-red-950">Selesaikan Pembayaran</h2>
-            <p className="text-red-700 text-xs sm:text-sm mb-6 sm:mb-8 font-semibold">Scan kode QR di bawah ini.</p>
-            
-            <div className="bg-white p-3 sm:p-4 rounded-2xl inline-block mb-6 sm:mb-8 border border-red-100 shadow-sm">
-              <div className="w-40 h-40 sm:w-48 sm:h-48 border border-red-50 rounded-xl flex items-center justify-center bg-white">
-                {isLoading ? (
-                  <Loader2 size={32} className="text-red-300 animate-spin" />
-                ) : (
-                  <QrCode size={160} className="text-red-950" strokeWidth={1.2} />
-                )}
+            {midtransRedirectUrl ? (
+              <div className="space-y-4 mb-6">
+                <a 
+                  href={midtransRedirectUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98] cursor-pointer"
+                >
+                  <QrCode size={18} />
+                  Bayar Sekarang (Midtrans)
+                </a>
+                <p className="text-[10px] text-slate-500 font-medium leading-relaxed px-4">
+                  Didukung oleh Midtrans. Klik tombol di atas untuk membayar secara instan menggunakan QRIS, Gopay, OVO, Dana, ShopeePay, atau Virtual Account Bank.
+                </p>
               </div>
-            </div>
+            ) : (
+              <>
+                <p className="text-red-750 text-xs sm:text-sm mb-6 sm:mb-8 font-semibold">Scan kode QR di bawah ini.</p>
+                <div className="bg-white p-3 sm:p-4 rounded-2xl inline-block mb-6 sm:mb-8 border border-red-100 shadow-sm">
+                  <div className="w-40 h-40 sm:w-48 sm:h-48 border border-red-50 rounded-xl flex items-center justify-center bg-white">
+                    {isLoading ? (
+                      <Loader2 size={32} className="text-red-300 animate-spin" />
+                    ) : (
+                      <QrCode size={160} className="text-red-950" strokeWidth={1.2} />
+                    )}
+                  </div>
+                </div>
+              </>
+            )}
             
             <div className="mb-6 sm:mb-8">
               <p className="text-[10px] sm:text-xs text-red-700 font-bold mb-1 uppercase tracking-wider">Total Tagihan</p>
-              <p className="text-2xl sm:text-3xl font-bold text-red-600">{formatRupiah(currentPrice)}</p>
+              <p className="text-2xl sm:text-3xl font-bold text-red-650">{formatRupiah(currentPrice)}</p>
             </div>
 
             <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-4 rounded-full mb-6 sm:mb-8 mx-auto border border-red-100 w-auto max-w-full">
