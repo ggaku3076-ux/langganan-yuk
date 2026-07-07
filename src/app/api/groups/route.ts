@@ -14,13 +14,13 @@ export async function GET(req: NextRequest) {
       return NextResponse.json({ error: "Service ID is required" }, { status: 400 });
     }
 
-    // 1. Fetch active waiting groups for this service with the matching max slots
+    // 1. Fetch active groups for this service (both waiting and full status)
     let { data: groups, error } = await supabaseAdmin
       .from("groups")
       .select("*")
       .eq("service_id", serviceId)
       .eq("max_slots", slots)
-      .eq("status", "waiting")
+      .in("status", ["waiting", "full"])
       .order("group_number", { ascending: true });
 
     if (error) {
@@ -28,7 +28,7 @@ export async function GET(req: NextRequest) {
     }
 
     // 2. If no active waiting group exists, automatically prepare a new group
-    if (!groups || groups.length === 0) {
+    if (!groups || groups.length === 0 || !groups.some(g => g.status === "waiting")) {
       // Find the last group number for this service
       const { data: lastGroup } = await supabaseAdmin
         .from("groups")
@@ -59,7 +59,11 @@ export async function GET(req: NextRequest) {
         return NextResponse.json({ error: insertErr.message }, { status: 500 });
       }
 
-      groups = [newGroup];
+      if (!groups) {
+        groups = [newGroup];
+      } else {
+        groups = [...groups, newGroup];
+      }
     }
 
     // 3. Fetch all active transactions (SUCCESS & PENDING) for these groups

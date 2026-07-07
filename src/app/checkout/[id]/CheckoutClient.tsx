@@ -95,12 +95,18 @@ export default function CheckoutClient({ service }: { service: any }) {
               filled: trxs.filter((t: any) => t.status === "SUCCESS").length,
               pending: trxs.filter((t: any) => t.status === "PENDING").length,
               total: g.max_slots,
-              status: trxs.length >= g.max_slots - 1 ? "hampir-penuh" : "tersedia",
+              status: trxs.filter((t: any) => t.status === "SUCCESS").length >= g.max_slots 
+                ? "penuh" 
+                : trxs.filter((t: any) => t.status === "SUCCESS").length >= g.max_slots - 1 
+                ? "hampir-penuh" 
+                : "tersedia",
               slots
             };
           });
           setGroups(formattedGroups);
-          setSelectedGroup(formattedGroups[0] || null);
+          
+          const firstAvailableGroup = formattedGroups.find((g: any) => g.filled < g.total);
+          setSelectedGroup(firstAvailableGroup || formattedGroups[0] || null);
         } else {
           setGroupsError("Format data grup dari server tidak valid.");
         }
