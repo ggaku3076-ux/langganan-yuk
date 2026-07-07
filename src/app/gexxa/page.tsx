@@ -277,6 +277,44 @@ export default function AdminDashboard() {
     }
   };
 
+  const handleCreateGroupManually = async (serviceId: string) => {
+    const svc = services.find((s) => s.id === serviceId);
+    if (!svc) return;
+
+    const slotInput = prompt(
+      `Masukkan jumlah slot maksimal untuk grup baru ${svc.name} (contoh: 3 atau 4):`,
+      String(svc.totalSlots)
+    );
+    if (slotInput === null) return;
+
+    const maxSlots = parseInt(slotInput);
+    if (isNaN(maxSlots) || maxSlots <= 0) {
+      alert("Jumlah slot harus berupa angka positif!");
+      return;
+    }
+
+    try {
+      const response = await fetch("/api/admin/groups", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": "Bearer raihan9898"
+        },
+        body: JSON.stringify({ serviceId, maxSlots })
+      });
+      const data = await response.json();
+      if (response.ok) {
+        alert("Grup baru berhasil dibuat!");
+        await fetchGroupsList();
+      } else {
+        alert(`Gagal membuat grup: ${data.error}`);
+      }
+    } catch (err) {
+      console.error("Error creating group:", err);
+      alert("Kesalahan jaringan saat membuat grup.");
+    }
+  };
+
   const handleUpdateStatus = async (id: string, newStatus: "PENDING" | "SUCCESS" | "EXPIRED") => {
     try {
       const response = await fetch("/api/admin/transactions", {
@@ -776,6 +814,20 @@ export default function AdminDashboard() {
             </div>
 
             {/* List of Groups for Selected Service */}
+            <div className="bg-white border border-red-100 rounded-3xl p-6 shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-black text-red-950">Grup Aktif: {services.find(s => s.id === selectedServiceForGroups)?.name}</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Kelola status keanggotaan grup patungan yang berjalan</p>
+              </div>
+              <button 
+                onClick={() => handleCreateGroupManually(selectedServiceForGroups)}
+                className="bg-red-650 hover:bg-red-700 text-white font-black text-xs px-4 py-2.5 rounded-xl border border-red-700 transition-all flex items-center gap-1.5 shadow-md shadow-red-600/10 cursor-pointer"
+              >
+                <PlusCircle size={15} />
+                Tambah Grup Baru
+              </button>
+            </div>
+
             <div className="space-y-8">
               {groupsList.filter(g => g.service_id === selectedServiceForGroups).length === 0 ? (
                 <div className="bg-white border border-red-100 rounded-3xl p-12 text-center text-slate-400 font-bold">

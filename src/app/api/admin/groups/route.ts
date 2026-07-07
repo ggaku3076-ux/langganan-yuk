@@ -77,3 +77,53 @@ export async function DELETE(req: NextRequest) {
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }
+
+// POST: Create a new group manually
+export async function POST(req: NextRequest) {
+  if (!isAuthorized(req)) {
+    return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
+  }
+
+  try {
+    const body = await req.json();
+    const { serviceId, maxSlots } = body;
+
+    if (!serviceId || !maxSlots) {
+      return NextResponse.json({ error: "Service ID and Max Slots are required" }, { status: 400 });
+    }
+
+    // Find the last group number for this service
+    const { data: lastGroup } = await supabaseAdmin
+      .from("groups")
+      .select("group_number")
+      .eq("service_id", serviceId)
+      .order("group_number", { ascending: false })
+      .limit(1)
+      .maybeSingle();
+
+    const nextGroupNumber = lastGroup ? lastGroup.group_number + 1 : 1;
+    const newGroupId = `${serviceId}-group-${nextGroupNumber}`;
+
+    // Insert group
+    const { data: newGroup, error } = await supabaseAdmin
+      .from("groups")
+      .insert({
+        id: newGroupId,
+        service_id: serviceId,
+        group_number: nextGroupNumber,
+        max_slots: maxSlots,
+        filled_slots: 0,
+        status: "waiting"
+      })
+      .select()
+      .single();
+
+    if (error) {
+      return NextResponse.json({ error: error.message }, { status: 500 });
+    }
+
+    return NextResponse.json({ success: true, group: newGroup });
+  } catch (err: any) {
+    return NextResponse.json({ error: err.message }, { status: 500 });
+  }
+}
