@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { 
   Users, 
-  TrendingUp, 
   Clock, 
   CheckCircle, 
   Search, 
@@ -19,10 +18,13 @@ import {
   EyeOff, 
   Database, 
   Smartphone,
-  ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  PlusCircle,
+  Tag,
+  Key,
+  FolderOpen,
+  ChevronRight
 } from "lucide-react";
-import Link from "next/link";
 import { services, formatRupiah } from "@/data/services";
 
 // Define mock data matching current checkout flows
@@ -119,6 +121,9 @@ export default function AdminDashboard() {
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
 
+  // Tab state: "transactions" | "inventory"
+  const [activeTab, setActiveTab] = useState<"transactions" | "inventory">("transactions");
+
   // Check authentication status on mount & hide global layout components
   useEffect(() => {
     const authStatus = localStorage.getItem("gexxa_auth");
@@ -169,7 +174,7 @@ export default function AdminDashboard() {
   };
 
   const handleDeleteTrx = (id: string) => {
-    if (confirm("Apakah Anda yakin ingin menghapus data transaksi ini dari log?")) {
+    if (confirm("Apakah Anda yakin ingin menghapus data transaksi ini?")) {
       setTransactions(transactions.filter(t => t.id !== id));
     }
   };
@@ -209,59 +214,57 @@ export default function AdminDashboard() {
 
   const pendingCount = transactions.filter(t => t.status === "PENDING").length;
   const successCount = transactions.filter(t => t.status === "SUCCESS").length;
-  const expiredCount = transactions.filter(t => t.status === "EXPIRED").length;
 
   if (!isAuthenticated) {
     return (
-      <div className="min-h-screen bg-slate-950 flex flex-col justify-center items-center px-4 relative overflow-hidden">
-        {/* Glow Effects */}
-        <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-red-600/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-red-900/10 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+      <div className="min-h-screen bg-slate-50 flex flex-col justify-center items-center px-4 relative">
+        {/* Aesthetic Background Grid Patterns */}
+        <div className="absolute inset-0 bg-[radial-gradient(#e21f1f_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none"></div>
 
-        <div className="w-full max-w-md bg-slate-900/80 backdrop-blur-xl border border-slate-800 rounded-3xl p-8 shadow-2xl relative">
+        <div className="w-full max-w-md bg-white border border-red-100 rounded-3xl p-8 shadow-xl relative z-10">
           <div className="flex flex-col items-center mb-8">
-            <div className="w-14 h-14 bg-red-950 border border-red-600/30 rounded-2xl flex items-center justify-center text-red-500 mb-4 shadow-lg shadow-red-900/20">
-              <Lock size={28} />
+            <div className="w-16 h-16 bg-red-50 border-2 border-red-600 rounded-2xl flex items-center justify-center text-red-600 mb-4 shadow-md">
+              <Lock size={32} />
             </div>
-            <h1 className="text-2xl font-black text-white tracking-tight">Gexxa Control Room</h1>
-            <p className="text-slate-400 text-sm mt-1 text-center font-medium">Masukkan kredensial admin rahasia untuk melanjutkan</p>
+            <h1 className="text-2xl font-black text-red-950 tracking-tight">Gexxa Control Room</h1>
+            <p className="text-red-800 text-sm mt-1 text-center font-bold">LayananYuk Admin Security Portal</p>
           </div>
 
           <form onSubmit={handleLogin} className="space-y-5">
             {loginError && (
-              <div className="p-4 bg-red-950/80 border border-red-800 text-red-200 text-sm rounded-2xl font-bold flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-red-500 animate-ping"></div>
+              <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl font-bold flex items-center gap-2">
+                <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
                 {loginError}
               </div>
             )}
 
             <div>
-              <label className="block text-slate-300 text-sm font-bold mb-2">Username</label>
+              <label className="block text-red-950 text-xs font-black uppercase tracking-wider mb-2">Username</label>
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 placeholder="Masukkan username"
-                className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/20 transition-all font-medium"
+                className="w-full bg-slate-55/30 border-2 border-slate-200 text-red-950 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-red-600 transition-all font-bold"
                 required
               />
             </div>
 
             <div>
-              <label className="block text-slate-300 text-sm font-bold mb-2">Password</label>
+              <label className="block text-red-950 text-xs font-black uppercase tracking-wider mb-2">Password</label>
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Masukkan password"
-                  className="w-full bg-slate-950 border border-slate-800 text-white rounded-2xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/20 transition-all font-medium"
+                  className="w-full bg-slate-55/30 border-2 border-slate-200 text-red-950 rounded-2xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:border-red-600 transition-all font-bold"
                   required
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-white transition-colors cursor-pointer"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -270,7 +273,7 @@ export default function AdminDashboard() {
 
             <button
               type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold py-3 px-4 rounded-2xl shadow-lg shadow-red-600/20 transition-all cursor-pointer flex items-center justify-center gap-2 text-sm mt-8"
+              className="w-full bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-red-600/10 transition-all cursor-pointer flex items-center justify-center gap-2 text-sm mt-8 border-2 border-red-700"
             >
               <Unlock size={18} />
               Buka Akses Console
@@ -279,314 +282,443 @@ export default function AdminDashboard() {
         </div>
 
         {/* Footer info */}
-        <p className="text-slate-600 text-xs mt-8 flex items-center gap-1 font-medium">
-          <ShieldCheck size={14} /> Secure Access Logged
+        <p className="text-red-900/60 text-xs mt-8 flex items-center gap-1 font-bold">
+          <ShieldCheck size={14} className="text-red-600" /> Secure Admin Access Logged
         </p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-50 text-red-950 flex flex-col font-sans">
       {/* HEADER CONSOLE */}
-      <header className="bg-slate-900 border-b border-slate-800 sticky top-0 z-30">
+      <header className="bg-red-600 border-b border-red-700 sticky top-0 z-30 shadow-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex justify-between items-center">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-red-950 border border-red-600 text-red-500 rounded-xl flex items-center justify-center font-black">
-              GX
+            <div className="w-10 h-10 bg-white border border-red-200 text-red-600 rounded-xl flex items-center justify-center font-black shadow-sm">
+              LY
             </div>
             <div>
-              <span className="text-white font-black text-base tracking-tight flex items-center gap-1.5">
-                Gexxa Console <span className="bg-red-950 border border-red-800 text-red-400 font-extrabold text-[10px] uppercase px-1.5 py-0.5 rounded-md">Admin</span>
+              <span className="text-white font-black text-lg tracking-tight flex items-center gap-1.5">
+                Gexxa Console <span className="bg-white text-red-600 font-black text-[9px] uppercase px-1.5 py-0.5 rounded border border-red-100 shadow-sm">ADMIN</span>
               </span>
-              <p className="text-[10px] text-slate-400 font-medium">LanggananYuk Control Station</p>
+              <p className="text-[10px] text-red-100 font-bold">LanggananYuk Control Station</p>
             </div>
           </div>
 
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-3">
             {/* Database indicator */}
-            <div className="hidden sm:flex items-center gap-2 bg-slate-950 px-3 py-1.5 rounded-xl border border-slate-800">
-              <Database size={14} className="text-emerald-500 animate-pulse" />
-              <span className="text-xs text-slate-400 font-semibold">Supabase Connected</span>
+            <div className="hidden md:flex items-center gap-2 bg-red-700/60 px-3 py-1.5 rounded-xl border border-red-500/30">
+              <Database size={13} className="text-white animate-pulse" />
+              <span className="text-[10px] text-white font-bold">Supabase Active</span>
             </div>
 
             <button
               onClick={handleLogout}
-              className="bg-slate-800 hover:bg-red-950 hover:text-red-400 text-slate-300 font-bold px-3 py-1.5 rounded-xl border border-slate-700 hover:border-red-900 transition-all cursor-pointer flex items-center gap-1.5 text-xs"
+              className="bg-white hover:bg-red-50 text-red-600 font-black px-3.5 py-1.5 rounded-xl border border-white transition-all cursor-pointer flex items-center gap-1.5 text-xs shadow-sm"
             >
-              <LogOut size={14} />
+              <LogOut size={13} />
               Keluar
             </button>
           </div>
         </div>
       </header>
 
+      {/* SUB-HEADER / TAB NAVIGATION */}
+      <div className="bg-white border-b border-slate-200 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex">
+          <button 
+            onClick={() => setActiveTab("transactions")}
+            className={`py-4 px-6 font-black text-xs uppercase tracking-wider border-b-4 transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === "transactions" 
+                ? "border-red-600 text-red-600" 
+                : "border-transparent text-slate-500 hover:text-red-950"
+            }`}
+          >
+            <Clock size={15} />
+            Daftar Transaksi
+          </button>
+          <button 
+            onClick={() => setActiveTab("inventory")}
+            className={`py-4 px-6 font-black text-xs uppercase tracking-wider border-b-4 transition-all cursor-pointer flex items-center gap-2 ${
+              activeTab === "inventory" 
+                ? "border-red-600 text-red-600" 
+                : "border-transparent text-slate-500 hover:text-red-950"
+            }`}
+          >
+            <FolderOpen size={15} />
+            Katalog Layanan & Stok
+          </button>
+        </div>
+      </div>
+
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-8">
         
         {/* STATS SECTION */}
         <section className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-red-950 border border-red-600/30 text-red-500 rounded-2xl flex items-center justify-center">
+          <div className="bg-white border border-red-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-red-50 border border-red-200 text-red-600 rounded-2xl flex items-center justify-center">
               <DollarSign size={24} />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-semibold">Total Pendapatan</p>
-              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight mt-0.5">{formatRupiah(totalSales)}</h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Total Pendapatan</p>
+              <h3 className="text-lg sm:text-2xl font-black text-red-950 tracking-tight mt-0.5">{formatRupiah(totalSales)}</h3>
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-amber-950/40 border border-amber-600/30 text-amber-500 rounded-2xl flex items-center justify-center">
-              <Clock size={24} className="animate-spin" style={{ animationDuration: '6s' }} />
+          <div className="bg-white border border-red-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-amber-50 border border-amber-200 text-amber-600 rounded-2xl flex items-center justify-center">
+              <Clock size={24} />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-semibold">Transaksi Pending</p>
-              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight mt-0.5">{pendingCount} <span className="text-xs text-slate-500 font-medium">Antrean</span></h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Antrean Pending</p>
+              <h3 className="text-lg sm:text-2xl font-black text-red-950 tracking-tight mt-0.5">{pendingCount} <span className="text-xs text-slate-400 font-bold">User</span></h3>
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-emerald-950/40 border border-emerald-600/30 text-emerald-500 rounded-2xl flex items-center justify-center">
+          <div className="bg-white border border-red-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-emerald-50 border border-emerald-200 text-emerald-600 rounded-2xl flex items-center justify-center">
               <CheckCircle size={24} />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-semibold">Transaksi Sukses</p>
-              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight mt-0.5">{successCount} <span className="text-xs text-slate-500 font-medium">Lunas</span></h3>
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Transaksi Sukses</p>
+              <h3 className="text-lg sm:text-2xl font-black text-red-950 tracking-tight mt-0.5">{successCount} <span className="text-xs text-slate-400 font-bold">Lunas</span></h3>
             </div>
           </div>
 
-          <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl shadow-sm flex items-center gap-4">
-            <div className="w-12 h-12 bg-slate-950 border border-slate-800 text-slate-400 rounded-2xl flex items-center justify-center">
+          <div className="bg-white border border-red-100 p-5 rounded-2xl shadow-sm flex items-center gap-4">
+            <div className="w-12 h-12 bg-red-50 border border-red-100 text-red-600 rounded-2xl flex items-center justify-center">
               <Users size={24} />
             </div>
             <div>
-              <p className="text-xs text-slate-400 font-semibold">Tingkat Konversi</p>
-              <h3 className="text-lg sm:text-2xl font-black text-white tracking-tight mt-0.5">
+              <p className="text-[10px] text-slate-500 font-bold uppercase tracking-wider">Tingkat Konversi</p>
+              <h3 className="text-lg sm:text-2xl font-black text-red-950 tracking-tight mt-0.5">
                 {transactions.length > 0 ? Math.round((successCount / transactions.length) * 100) : 0}%
               </h3>
             </div>
           </div>
         </section>
 
-        {/* MANAGEMENT PANEL */}
-        <section className="bg-slate-900 border border-slate-800 rounded-3xl shadow-sm overflow-hidden">
-          <div className="p-6 border-b border-slate-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div>
-              <h2 className="text-lg font-black text-white flex items-center gap-2">
-                <span>Daftar Transaksi Patungan</span>
-                <span className="bg-slate-800 text-slate-300 text-xs font-bold px-2 py-0.5 rounded-full">{filteredTransactions.length} Log</span>
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">Pantau verifikasi QRIS, antrean grup, dan trigger pesan kirim akun WA</p>
+        {activeTab === "transactions" ? (
+          /* TAB 1: TRANSACTIONS LOGS */
+          <section className="bg-white border border-red-100 rounded-3xl shadow-sm overflow-hidden">
+            <div className="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-black text-red-950 flex items-center gap-2">
+                  <span>Log Transaksi Langganan</span>
+                  <span className="bg-red-50 text-red-600 text-xs font-black px-2 py-0.5 rounded-full border border-red-100">{filteredTransactions.length} Pembeli</span>
+                </h2>
+                <p className="text-xs text-slate-500 mt-0.5">Kelola verifikasi status bayar dan trigger otomatisasi kirim kredensial WA</p>
+              </div>
+
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={handleRefresh}
+                  disabled={isRefreshing}
+                  className="bg-white hover:bg-slate-50 active:scale-95 disabled:opacity-50 text-slate-600 font-bold p-2.5 rounded-xl border border-slate-200 transition-all cursor-pointer shadow-sm"
+                  title="Refresh Data"
+                >
+                  <RefreshCw size={16} className={isRefreshing ? "animate-spin text-red-600" : ""} />
+                </button>
+              </div>
             </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleRefresh}
-                disabled={isRefreshing}
-                className="bg-slate-800 hover:bg-slate-700 active:scale-95 disabled:opacity-50 text-white font-bold p-2.5 rounded-xl border border-slate-700 transition-all cursor-pointer"
-                title="Refresh Data"
+            {/* FILTERS */}
+            <div className="p-6 bg-slate-50/50 border-b border-slate-100 grid md:grid-cols-4 gap-4">
+              {/* Search */}
+              <div className="relative md:col-span-2">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400">
+                  <Search size={16} />
+                </span>
+                <input
+                  type="text"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  placeholder="Cari (Nama, WhatsApp, ID Invoice, ID Referensi)"
+                  className="w-full bg-white border border-slate-200 rounded-xl pl-10 pr-4 py-2.5 text-xs text-red-950 focus:outline-none focus:border-red-600 transition-all font-bold placeholder-slate-400"
+                />
+              </div>
+
+              {/* Filter Status */}
+              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1 shadow-sm">
+                <span className="text-slate-400"><Filter size={14} /></span>
+                <select
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                  className="w-full bg-transparent text-xs text-slate-700 font-bold focus:outline-none border-none cursor-pointer"
+                >
+                  <option value="ALL">Semua Status</option>
+                  <option value="SUCCESS">Lunas (SUCCESS)</option>
+                  <option value="PENDING">Menunggu (PENDING)</option>
+                  <option value="EXPIRED">Gagal (EXPIRED)</option>
+                </select>
+              </div>
+
+              {/* Filter Service */}
+              <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-xl px-3 py-1 shadow-sm">
+                <span className="text-slate-400"><Filter size={14} /></span>
+                <select
+                  value={serviceFilter}
+                  onChange={(e) => setServiceFilter(e.target.value)}
+                  className="w-full bg-transparent text-xs text-slate-700 font-bold focus:outline-none border-none cursor-pointer"
+                >
+                  <option value="ALL">Semua Layanan</option>
+                  {services.map(s => (
+                    <option key={s.id} value={s.id}>{s.name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            {/* TABLE CONTAINER */}
+            <div className="overflow-x-auto w-full">
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b border-slate-100 text-[10px] uppercase tracking-wider text-slate-500 font-black bg-slate-50/50">
+                    <th className="py-4 px-6">ID & Referensi</th>
+                    <th className="py-4 px-6">Pelanggan</th>
+                    <th className="py-4 px-6">Layanan & Opsi</th>
+                    <th className="py-4 px-6">Total Tagihan</th>
+                    <th className="py-4 px-6">Status</th>
+                    <th className="py-4 px-6 text-center">Aksi / Kontrol</th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100 text-xs">
+                  {filteredTransactions.length === 0 ? (
+                    <tr>
+                      <td colSpan={6} className="py-12 text-center text-slate-400 font-bold bg-white">
+                        <div className="flex flex-col items-center gap-2">
+                          <Search size={32} className="text-slate-350" />
+                          <span>Tidak ada transaksi yang cocok</span>
+                        </div>
+                      </td>
+                    </tr>
+                  ) : (
+                    filteredTransactions.map((trx) => {
+                      const svc = services.find(s => s.id === trx.serviceId);
+                      return (
+                        <tr key={trx.id} className="hover:bg-slate-50/50 transition-colors">
+                          <td className="py-4 px-6">
+                            <span className="font-black text-red-950 tracking-tight">{trx.id}</span>
+                            <p className="text-[10px] text-slate-400 mt-0.5 font-bold">
+                              {trx.referenceId}
+                            </p>
+                          </td>
+
+                          <td className="py-4 px-6">
+                            <span className="font-black text-slate-900">{trx.name}</span>
+                            <a 
+                              href={`https://wa.me/${trx.whatsapp.replace(/^0/, '62')}`}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-[10px] text-emerald-600 hover:underline mt-0.5 flex items-center gap-0.5 font-black"
+                            >
+                              <Smartphone size={10} />
+                              {trx.whatsapp}
+                            </a>
+                          </td>
+
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-2">
+                              {svc?.logoUrl && (
+                                <img 
+                                  src={svc.logoUrl} 
+                                  alt={svc.name} 
+                                  className="w-5 h-5 object-contain"
+                                  onError={(e) => {
+                                    // Fallback if image fails to load
+                                    (e.target as HTMLElement).style.display = 'none';
+                                  }}
+                                />
+                              )}
+                              <span className="font-black text-red-950">{svc?.name || trx.serviceId}</span>
+                            </div>
+                            <p className="text-[10px] text-slate-400 mt-0.5 font-bold">
+                              Paket {trx.optionLabel} &bull; <span className="text-[9px] bg-slate-100 text-slate-600 px-1 py-0.5 rounded font-black">{trx.groupId}</span>
+                            </p>
+                          </td>
+
+                          <td className="py-4 px-6">
+                            <span className="font-black text-red-950">{formatRupiah(trx.price)}</span>
+                            <p className="text-[10px] text-slate-400 mt-0.5 font-semibold">{trx.timestamp}</p>
+                          </td>
+
+                          <td className="py-4 px-6">
+                            {trx.status === "SUCCESS" && (
+                              <span className="bg-emerald-50 border border-emerald-200 text-emerald-700 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500"></span> SUCCESS
+                              </span>
+                            )}
+                            {trx.status === "PENDING" && (
+                              <span className="bg-amber-50 border border-amber-200 text-amber-700 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1 shadow-sm">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> PENDING
+                              </span>
+                            )}
+                            {trx.status === "EXPIRED" && (
+                              <span className="bg-slate-100 border border-slate-200 text-slate-500 font-black text-[10px] px-2.5 py-0.5 rounded-full inline-flex items-center gap-1">
+                                <span className="w-1.5 h-1.5 rounded-full bg-slate-400"></span> EXPIRED
+                              </span>
+                            )}
+                          </td>
+
+                          <td className="py-4 px-6 text-center">
+                            <div className="flex items-center justify-center gap-2">
+                              {/* Toggle payment status shortcut */}
+                              {trx.status === "PENDING" && (
+                                <button
+                                  onClick={() => handleUpdateStatus(trx.id, "SUCCESS")}
+                                  className="bg-emerald-50 hover:bg-emerald-600 hover:text-white border border-emerald-300 hover:border-emerald-600 text-emerald-600 font-black px-2 py-1 rounded-lg text-[10px] transition-all cursor-pointer shadow-sm"
+                                  title="Set Lunas"
+                                >
+                                  Set Lunas
+                                </button>
+                              )}
+
+                              {/* Trigger WA Account delivery */}
+                              <button
+                                onClick={() => handleOpenCredentials(trx)}
+                                disabled={trx.status !== "SUCCESS"}
+                                className="bg-white hover:bg-red-50 disabled:opacity-30 disabled:pointer-events-none text-red-600 border border-slate-250 hover:border-red-200 font-bold p-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
+                                title="Kirim Kredensial via WA"
+                              >
+                                <Send size={12} />
+                              </button>
+
+                              {/* Delete Log */}
+                              <button
+                                onClick={() => handleDeleteTrx(trx.id)}
+                                className="bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 hover:border-red-200 border border-slate-250 p-1.5 rounded-lg transition-all cursor-pointer shadow-sm"
+                                title="Hapus Log"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          </td>
+                        </tr>
+                      );
+                    })
+                  )}
+                </tbody>
+              </table>
+            </div>
+          </section>
+        ) : (
+          /* TAB 2: SERVICE INVENTORY & DATA */
+          <section className="space-y-6">
+            {/* Catalog Info */}
+            <div className="bg-white border border-red-100 rounded-3xl p-6 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <h2 className="text-lg font-black text-red-950">Skema & Harga Produk Aktif</h2>
+                <p className="text-xs text-slate-500 mt-0.5">Daftar harga patungan, opsi user, dan limitasi stok produk premium</p>
+              </div>
+              <button 
+                onClick={() => alert("Fitur Tambah Produk akan terhubung ke form database Supabase.")}
+                className="bg-red-600 hover:bg-red-700 text-white font-black text-xs px-4 py-2.5 rounded-xl border border-red-700 transition-all flex items-center gap-1.5 shadow-md shadow-red-600/10 cursor-pointer"
               >
-                <RefreshCw size={16} className={isRefreshing ? "animate-spin" : ""} />
+                <PlusCircle size={15} />
+                Tambah Layanan Baru
               </button>
             </div>
-          </div>
 
-          {/* FILTERS */}
-          <div className="p-6 bg-slate-950/40 border-b border-slate-800/80 grid md:grid-cols-4 gap-4">
-            {/* Search */}
-            <div className="relative md:col-span-2">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">
-                <Search size={16} />
-              </span>
-              <input
-                type="text"
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Cari transaksi (Nama, WhatsApp, Invoice ID, Referensi)"
-                className="w-full bg-slate-950 border border-slate-800 rounded-xl pl-10 pr-4 py-2.5 text-xs text-white focus:outline-none focus:border-red-600 focus:ring-1 focus:ring-red-600/20 transition-all font-semibold"
-              />
-            </div>
-
-            {/* Filter Status */}
-            <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1">
-              <span className="text-slate-500"><Filter size={14} /></span>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full bg-transparent text-xs text-slate-300 font-bold focus:outline-none border-none cursor-pointer"
-              >
-                <option value="ALL">Semua Status</option>
-                <option value="SUCCESS">Lunas (SUCCESS)</option>
-                <option value="PENDING">Menunggu (PENDING)</option>
-                <option value="EXPIRED">Gagal (EXPIRED)</option>
-              </select>
-            </div>
-
-            {/* Filter Service */}
-            <div className="flex items-center gap-2 bg-slate-950 border border-slate-800 rounded-xl px-3 py-1">
-              <span className="text-slate-500"><Filter size={14} /></span>
-              <select
-                value={serviceFilter}
-                onChange={(e) => setServiceFilter(e.target.value)}
-                className="w-full bg-transparent text-xs text-slate-300 font-bold focus:outline-none border-none cursor-pointer"
-              >
-                <option value="ALL">Semua Layanan</option>
-                {services.map(s => (
-                  <option key={s.id} value={s.id}>{s.name}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* TABLE CONTAINER */}
-          <div className="overflow-x-auto w-full">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-slate-800 text-[10px] uppercase tracking-wider text-slate-400 font-black bg-slate-950/20">
-                  <th className="py-4 px-6">ID & Referensi</th>
-                  <th className="py-4 px-6">Pelanggan</th>
-                  <th className="py-4 px-6">Layanan & Opsi</th>
-                  <th className="py-4 px-6">Pembayaran</th>
-                  <th className="py-4 px-6">Status</th>
-                  <th className="py-4 px-6 text-center">Aksi / Kontrol</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60 text-xs">
-                {filteredTransactions.length === 0 ? (
-                  <tr>
-                    <td colSpan={6} className="py-12 text-center text-slate-500 font-medium bg-slate-950/5">
-                      <div className="flex flex-col items-center gap-2">
-                        <Search size={32} className="text-slate-600" />
-                        <span>Tidak ada transaksi yang cocok dengan filter pencarian</span>
+            {/* CATALOG CARDS */}
+            <div className="grid md:grid-cols-2 gap-6">
+              {services.map((svc) => (
+                <div key={svc.id} className="bg-white border border-red-100 rounded-3xl shadow-sm p-6 flex flex-col justify-between">
+                  <div className="space-y-4">
+                    {/* Card Title & Logo */}
+                    <div className="flex justify-between items-start">
+                      <div className="flex items-center gap-3">
+                        <div className="w-12 h-12 bg-red-50 rounded-2xl border border-red-100 flex items-center justify-center p-2">
+                          <img src={svc.logoUrl} alt={svc.name} className="w-full h-full object-contain" />
+                        </div>
+                        <div>
+                          <h3 className="font-black text-red-950 text-base">{svc.name}</h3>
+                          <span className="text-[9px] bg-red-50 text-red-600 border border-red-100 font-extrabold uppercase px-1.5 py-0.5 rounded">
+                            {svc.category}
+                          </span>
+                        </div>
                       </div>
-                    </td>
-                  </tr>
-                ) : (
-                  filteredTransactions.map((trx) => {
-                    const svc = services.find(s => s.id === trx.serviceId);
-                    return (
-                      <tr key={trx.id} className="hover:bg-slate-850/40 transition-colors">
-                        <td className="py-4 px-6">
-                          <span className="font-bold text-white tracking-tight">{trx.id}</span>
-                          <p className="text-[10px] text-slate-400 mt-0.5 flex items-center gap-1 font-semibold">
-                            {trx.referenceId}
-                          </p>
-                        </td>
 
-                        <td className="py-4 px-6">
-                          <span className="font-bold text-white">{trx.name}</span>
-                          <a 
-                            href={`https://wa.me/${trx.whatsapp.replace(/^0/, '62')}`}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[10px] text-emerald-400 hover:underline mt-0.5 flex items-center gap-0.5 font-bold"
-                          >
-                            <Smartphone size={10} />
-                            {trx.whatsapp}
-                          </a>
-                        </td>
+                      <div className="text-right">
+                        <span className="text-[10px] text-slate-400 font-bold block">Harga Patungan</span>
+                        <span className="text-lg font-black text-red-600">{formatRupiah(svc.sharedPrice)}</span>
+                      </div>
+                    </div>
 
-                        <td className="py-4 px-6">
-                          <span className="font-bold text-slate-200">{svc?.name || trx.serviceId}</span>
-                          <p className="text-[10px] text-slate-400 mt-0.5 font-semibold">
-                            Paket {trx.optionLabel} &bull; <span className="text-[9px] bg-slate-800 text-slate-400 px-1 py-0.5 rounded font-extrabold">{trx.groupId}</span>
-                          </p>
-                        </td>
+                    {/* Features Description */}
+                    <p className="text-xs text-slate-600 font-bold leading-relaxed border-t border-slate-100 pt-3">
+                      {svc.description || "Tidak ada deskripsi rincian fitur."}
+                    </p>
 
-                        <td className="py-4 px-6">
-                          <span className="font-black text-white">{formatRupiah(trx.price)}</span>
-                          <p className="text-[10px] text-slate-500 mt-0.5 font-semibold">{trx.timestamp}</p>
-                        </td>
+                    {/* Options Details */}
+                    {svc.options && svc.options.length > 0 && (
+                      <div className="space-y-2 pt-2">
+                        <h4 className="text-[10px] font-black uppercase text-slate-400 tracking-wider flex items-center gap-1">
+                          <Tag size={10} /> Opsi Patungan Terkoneksi:
+                        </h4>
+                        <div className="grid grid-cols-3 gap-2">
+                          {svc.options.map((opt) => (
+                            <div key={opt.id} className="bg-slate-50 border border-slate-200 p-2.5 rounded-xl flex flex-col justify-between">
+                              <span className="text-[10px] font-black text-slate-800">{opt.label}</span>
+                              <span className="text-[11px] font-black text-red-600 mt-1">{formatRupiah(opt.price)}</span>
+                              {opt.note && (
+                                <span className="text-[8px] text-slate-400 font-bold mt-0.5">{opt.note}</span>
+                              )}
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
 
-                        <td className="py-4 px-6">
-                          {trx.status === "SUCCESS" && (
-                            <span className="bg-emerald-950 border border-emerald-900 text-emerald-400 font-extrabold text-[10px] px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> SUCCESS
-                            </span>
-                          )}
-                          {trx.status === "PENDING" && (
-                            <span className="bg-amber-950 border border-amber-900 text-amber-400 font-extrabold text-[10px] px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span> PENDING
-                            </span>
-                          )}
-                          {trx.status === "EXPIRED" && (
-                            <span className="bg-slate-850 border border-slate-800 text-slate-400 font-extrabold text-[10px] px-2 py-0.5 rounded-full inline-flex items-center gap-1">
-                              <span className="w-1.5 h-1.5 rounded-full bg-slate-500"></span> EXPIRED
-                            </span>
-                          )}
-                        </td>
-
-                        <td className="py-4 px-6 text-center">
-                          <div className="flex items-center justify-center gap-2">
-                            {/* Toggle payment status shortcut */}
-                            {trx.status === "PENDING" && (
-                              <button
-                                onClick={() => handleUpdateStatus(trx.id, "SUCCESS")}
-                                className="bg-emerald-950 hover:bg-emerald-900 border border-emerald-900 hover:border-emerald-700 text-emerald-400 font-bold px-2 py-1 rounded-lg text-[10px] transition-all cursor-pointer"
-                                title="Set Lunas"
-                              >
-                                Set Lunas
-                              </button>
-                            )}
-
-                            {/* Trigger WA Account delivery */}
-                            <button
-                              onClick={() => handleOpenCredentials(trx)}
-                              disabled={trx.status !== "SUCCESS"}
-                              className="bg-slate-800 hover:bg-red-950 hover:text-red-400 disabled:opacity-30 disabled:pointer-events-none text-slate-300 border border-slate-700 hover:border-red-900 font-bold p-1.5 rounded-lg transition-all cursor-pointer"
-                              title="Kirim Kredensial via WA"
-                            >
-                              <Send size={12} />
-                            </button>
-
-                            {/* Delete Log */}
-                            <button
-                              onClick={() => handleDeleteTrx(trx.id)}
-                              className="bg-slate-800 hover:bg-red-950 hover:text-red-500 text-slate-400 hover:border-red-900 border border-slate-700 p-1.5 rounded-lg transition-all cursor-pointer"
-                              title="Hapus Log"
-                            >
-                              <Trash2 size={12} />
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+                  {/* Stock inventory action footer */}
+                  <div className="border-t border-slate-100 mt-6 pt-4 flex items-center justify-between text-xs">
+                    <span className="text-slate-450 font-bold flex items-center gap-1">
+                      <Key size={13} className="text-red-500" />
+                      Stok Akun Aktif: <strong className="text-red-950 font-black">12 Ready</strong>
+                    </span>
+                    <button 
+                      onClick={() => alert("Mengalihkan ke pengaturan stok akun premium di Supabase.")}
+                      className="text-red-600 font-black hover:underline cursor-pointer flex items-center gap-0.5"
+                    >
+                      Kelola Akun <ChevronRight size={14} />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        )}
       </main>
 
       {/* CREDENTIALS/WHATSAPP DIALOG */}
       {showCredentialsModal && selectedTrx && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-2xl relative">
-            <h3 className="text-lg font-black text-white mb-2">Kirim Akun ke Pembeli</h3>
-            <p className="text-xs text-slate-400 mb-6">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white border border-red-100 rounded-3xl p-6 shadow-2xl relative">
+            <h3 className="text-lg font-black text-red-950 mb-2">Kirim Akun ke Pembeli</h3>
+            <p className="text-xs text-slate-500 mb-6">
               Kirim kredensial layanan patungan **{services.find(s => s.id === selectedTrx.serviceId)?.name}** langsung ke nomor **{selectedTrx.whatsapp}** ({selectedTrx.name}).
             </p>
 
             <div className="space-y-4">
               <div>
-                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-2">Pilih Stok Akun Aktif</label>
-                <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl flex justify-between items-center text-xs">
+                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Pilih Stok Akun Aktif</label>
+                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex justify-between items-center text-xs">
                   <div>
-                    <span className="font-bold text-white">netflix-indo-premium43@gmail.com</span>
+                    <span className="font-black text-slate-800">netflix-indo-premium43@gmail.com</span>
                     <p className="text-[10px] text-slate-500 mt-0.5">Password: IndoPrem332! &bull; Profile: 4</p>
                   </div>
-                  <span className="bg-emerald-950 text-emerald-400 border border-emerald-900 text-[9px] font-extrabold px-1.5 py-0.5 rounded">Ready</span>
+                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">Ready</span>
                 </div>
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-400 mb-2">Draft Pesan WhatsApp</label>
+                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Draft Pesan WhatsApp</label>
                 <textarea
                   readOnly
                   rows={6}
                   value={`Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${services.find(s => s.id === selectedTrx.serviceId)?.name} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: netflix-indo-premium43@gmail.com\n- Password: IndoPrem332!\n- Profil Penggunaan: Profil 4 / User 4\n- PIN Profil: 9912\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`}
-                  className="w-full bg-slate-950 border border-slate-800 text-slate-300 text-xs rounded-2xl p-4 focus:outline-none font-semibold leading-relaxed"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-2xl p-4 focus:outline-none font-bold leading-relaxed shadow-inner"
                 />
               </div>
             </div>
@@ -594,7 +726,7 @@ export default function AdminDashboard() {
             <div className="flex gap-3 mt-6">
               <button
                 onClick={() => setShowCredentialsModal(false)}
-                className="w-1/2 bg-slate-800 hover:bg-slate-700 text-white font-bold py-2.5 rounded-2xl text-xs cursor-pointer border border-slate-700 transition-all"
+                className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all"
               >
                 Batalkan
               </button>
@@ -603,7 +735,7 @@ export default function AdminDashboard() {
                   alert(`Pesanan akun premium sukses dikirim via WhatsApp ke ${selectedTrx.whatsapp}!`);
                   setShowCredentialsModal(false);
                 }}
-                className="w-1/2 bg-red-600 hover:bg-red-700 text-white font-bold py-2.5 rounded-2xl text-xs shadow-lg shadow-red-600/20 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                className="w-1/2 bg-red-600 hover:bg-red-700 text-white border border-red-700 font-bold py-2.5 rounded-2xl text-xs shadow-lg shadow-red-600/10 cursor-pointer transition-all flex items-center justify-center gap-1.5"
               >
                 <Send size={14} />
                 Kirim via Fonnte API
@@ -614,11 +746,11 @@ export default function AdminDashboard() {
       )}
 
       {/* FOOTER */}
-      <footer className="bg-slate-900 border-t border-slate-800 py-6 mt-12">
-        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-semibold flex flex-col sm:flex-row justify-between items-center gap-3">
+      <footer className="bg-white border-t border-slate-200 py-6 mt-12 shadow-inner">
+        <div className="max-w-7xl mx-auto px-4 text-center text-xs text-slate-500 font-bold flex flex-col sm:flex-row justify-between items-center gap-3">
           <span>&copy; 2026 LanggananYuk Admin Console. All Rights Reserved.</span>
-          <span className="flex items-center gap-1 text-[10px] bg-slate-950 px-2 py-1 border border-slate-800 rounded-lg">
-            <Lock size={10} /> Hashed Access: SHA-256 Enabled
+          <span className="flex items-center gap-1 text-[10px] bg-slate-50 px-2.5 py-1 border border-slate-200 rounded-lg">
+            <Lock size={10} className="text-red-600" /> Hashed Access: SHA-256 Enabled
           </span>
         </div>
       </footer>
