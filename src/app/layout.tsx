@@ -30,16 +30,21 @@ export default function RootLayout({
   return (
     <html lang="id">
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-red-950 selection:bg-red-600 selection:text-white flex flex-col min-h-screen`}>
-        <Navbar />
+        <div id="global-navbar">
+          <Navbar />
+        </div>
         
         <main className="flex-1 flex flex-col">
           {children}
         </main>
         
-        <Footer />
+        <div id="global-footer">
+          <Footer />
+        </div>
         
         {/* Floating Action Button - WhatsApp (Updated CS Number) */}
         <a 
+          id="global-whatsapp-fab"
           href="https://wa.me/6285286502731" 
           target="_blank" 
           rel="noopener noreferrer"

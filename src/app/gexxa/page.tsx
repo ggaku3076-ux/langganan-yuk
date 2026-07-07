@@ -119,17 +119,33 @@ export default function AdminDashboard() {
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
 
-  // Check authentication status on mount
+  // Check authentication status on mount & hide global layout components
   useEffect(() => {
     const authStatus = localStorage.getItem("gexxa_auth");
     if (authStatus === "true") {
       setIsAuthenticated(true);
     }
+
+    // Hide global website layout elements
+    const globalNavbar = document.getElementById("global-navbar");
+    const globalFooter = document.getElementById("global-footer");
+    const globalFab = document.getElementById("global-whatsapp-fab");
+
+    if (globalNavbar) globalNavbar.style.display = "none";
+    if (globalFooter) globalFooter.style.display = "none";
+    if (globalFab) globalFab.style.display = "none";
+
+    return () => {
+      // Restore global website layout elements on unmount
+      if (globalNavbar) globalNavbar.style.display = "";
+      if (globalFooter) globalFooter.style.display = "";
+      if (globalFab) globalFab.style.display = "";
+    };
   }, []);
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    if (username === "gexxa" && password === "admingexxa123") {
+    if (username === "gexxa" && password === "raihan9898") {
       setIsAuthenticated(true);
       setLoginError("");
       localStorage.setItem("gexxa_auth", "true");
