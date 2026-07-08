@@ -143,7 +143,7 @@ export const services: Service[] = [
     id: "m365",
     name: "Microsoft 365",
     category: "Productivity",
-    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/5/5f/Microsoft_Office_logo_%282019%E2%80%93present%29.svg",
+    logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/0e/Microsoft_365_(2022).svg",
     originalPrice: 129000,
     sharedPrice: 35000,
     totalSlots: 5,
