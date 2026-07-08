@@ -19,9 +19,9 @@ function generateRandomId(prefix: string, length: number) {
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
-    const { name, whatsapp, serviceId, optionLabel, price, groupId } = body;
+    const { name, whatsapp, email, serviceId, optionLabel, price, groupId } = body;
 
-    if (!name || !whatsapp || !serviceId || !optionLabel || !price || !groupId) {
+    if (!name || !whatsapp || !email || !serviceId || !optionLabel || !price || !groupId) {
       return NextResponse.json({ error: "Missing required checkout parameters" }, { status: 400 });
     }
 
@@ -52,6 +52,7 @@ export async function POST(req: NextRequest) {
         group_id: groupId,
         buyer_name: name,
         whatsapp_number: whatsapp,
+        buyer_email: email,
         service_id: serviceId,
         option_label: optionLabel,
         price: price,

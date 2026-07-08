@@ -36,6 +36,7 @@ export default function CheckoutClient({ service }: { service: any }) {
   const [appState, setAppState] = useState("checkout"); // checkout, payment, waiting
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
   const [agreed, setAgreed] = useState(false);
   const [timeLeft, setTimeLeft] = useState(15 * 60);
   const [isLoading, setIsLoading] = useState(false);
@@ -57,11 +58,16 @@ export default function CheckoutClient({ service }: { service: any }) {
 
   const maskName = (rawName: string) => {
     if (!rawName) return "Kosong";
-    const parts = rawName.split(" ");
-    return parts.map(part => {
-      if (part.length <= 1) return part;
-      return part[0] + "*".repeat(part.length - 1);
-    }).join(" ");
+    const firstChar = rawName.charAt(0).toLowerCase();
+    let masked = firstChar;
+    for (let i = 1; i < rawName.length; i++) {
+      if (rawName[i] === " ") {
+        masked += " ";
+      } else {
+        masked += "x";
+      }
+    }
+    return masked;
   };
 
   const fetchGroups = async () => {
@@ -74,11 +80,12 @@ export default function CheckoutClient({ service }: { service: any }) {
         if (data.groups) {
           const formattedGroups = data.groups.map((g: any) => {
             const trxs = g.transactions || [];
+            const isFull = trxs.filter((t: any) => t.status === "SUCCESS").length >= g.max_slots;
             const slots = Array.from({ length: g.max_slots }, (_, i) => {
               const tx = trxs[i];
               if (tx) {
                 return {
-                  name: maskName(tx.buyer_name),
+                  name: isFull ? maskName(tx.buyer_name) : tx.buyer_name,
                   occupied: true,
                   status: tx.status
                 };
@@ -136,6 +143,10 @@ export default function CheckoutClient({ service }: { service: any }) {
 
   const handleCheckout = async () => {
     if (!selectedGroup) return;
+    if (!name.trim() || !whatsapp.trim() || !email.trim()) {
+      alert("Harap isi semua kolom formulir (Nama, WhatsApp, dan Email)!");
+      return;
+    }
     setIsLoading(true);
     try {
       const response = await fetch("/api/checkout", {
@@ -144,6 +155,7 @@ export default function CheckoutClient({ service }: { service: any }) {
         body: JSON.stringify({
           name,
           whatsapp,
+          email,
           serviceId: service.id,
           optionLabel: selectedOption ? selectedOption.label : "Shared",
           price: currentPrice,
@@ -443,7 +455,24 @@ export default function CheckoutClient({ service }: { service: any }) {
                 />
                 <div className="text-[10px] sm:text-xs text-red-700 mt-2 flex items-start gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
                   <AlertCircle size={12} className="text-red-600 flex-shrink-0 mt-0.5" /> 
-                  <span>Akun premium akan dikirim ke nomor ini via WA.</span>
+                  <span>Notifikasi sukses pembayaran akan dikirim via WA.</span>
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs sm:text-sm font-semibold text-red-950 mb-2">
+                  Email Aktif Anda
+                </label>
+                <input 
+                  type="email" 
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="nama@email.com"
+                  className="w-full px-4 py-3 bg-red-50/30 border border-red-100 rounded-xl focus:outline-none focus:border-red-600 focus:bg-white transition-all text-red-950 placeholder-red-300 font-semibold text-sm sm:text-base"
+                />
+                <div className="text-[10px] sm:text-xs text-red-700 mt-2 flex items-start gap-1.5 font-semibold bg-red-50 p-2.5 rounded-lg">
+                  <AlertCircle size={12} className="text-red-600 flex-shrink-0 mt-0.5" /> 
+                  <span>Kredensial akun premium akan dikirim ke email ini saat grup penuh.</span>
                 </div>
               </div>
 

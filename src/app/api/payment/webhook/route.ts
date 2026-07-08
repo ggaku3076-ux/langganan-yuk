@@ -3,6 +3,9 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import crypto from "crypto";
 import { services, formatRupiah } from "@/data/services";
 import { sendWhatsApp } from "@/lib/fonnte";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 
 export const dynamic = "force-dynamic";
 
@@ -159,17 +162,43 @@ export async function POST(req: NextRequest) {
 
               const { data: groupBuyers } = await supabaseAdmin
                 .from("transactions")
-                .select("buyer_name, whatsapp_number")
+                .select("buyer_name, whatsapp_number, buyer_email")
                 .eq("group_id", trx.group_id)
                 .eq("status", "SUCCESS");
 
               if (groupBuyers && groupBuyers.length > 0) {
                 for (const buyer of groupBuyers) {
-                  const credMessage = `Halo ${buyer.buyer_name},\n\nKabar baik! Grup patungan *${svcName}* Anda telah penuh (4/4). 🚀\n\nBerikut adalah kredensial akun premium Anda:\n\n*Detail Akun:*\n- Email: \`${credential.email}\`\n- Password: \`${credential.password}\`\n- Profil: Profil ${credential.profile_number || "Bebas"}\n- PIN Profil: \`${credential.pin || "Tanpa PIN"}\`\n\n*Syarat & Ketentuan:*\n1. Dilarang mengubah email/password.\n2. Dilarang login di lebih dari 1 perangkat bersamaan.\n3. Gunakan hanya profil yang telah ditentukan.\n\nSelamat menikmati!\nLanggananYuk Support`;
-                  
-                  sendWhatsApp(buyer.whatsapp_number, credMessage).catch((err) =>
-                    console.error("Error broadcasting credentials WA:", err)
-                  );
+                  if (buyer.buyer_email) {
+                    resend.emails.send({
+                      from: "LanggananYuk <noreply@langgananyuk.web.id>",
+                      to: buyer.buyer_email,
+                      subject: `Kredensial Akun Premium ${svcName} Anda! 🎉`,
+                      html: `
+                        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #fee2e2; border-radius: 20px;">
+                          <h2 style="color: #991b1b; margin-top: 0;">Halo ${buyer.buyer_name},</h2>
+                          <p>Kabar baik! Grup patungan <strong>${svcName}</strong> Anda telah penuh (4/4) dan sudah aktif. 🚀</p>
+                          <div style="background-color: #fef2f2; padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid #fee2e2;">
+                            <h3 style="margin-top: 0; color: #991b1b; font-size: 16px;">Detail Akun Premium Anda:</h3>
+                            <ul style="list-style: none; padding-left: 0; margin-bottom: 0; line-height: 1.6;">
+                              <li><strong>Email Akun:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${credential.email}</code></li>
+                              <li><strong>Password:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${credential.password}</code></li>
+                              <li><strong>Profil:</strong> Profil ${credential.profile_number || "Bebas"}</li>
+                              <li><strong>PIN Profil:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${credential.profile_pin || "Tanpa PIN"}</code></li>
+                            </ul>
+                          </div>
+                          <h4 style="color: #991b1b; margin-bottom: 5px;">Syarat & Ketentuan:</h4>
+                          <ol style="margin-top: 0; padding-left: 20px; line-height: 1.6;">
+                            <li>Dilarang mengubah email/password akun.</li>
+                            <li>Dilarang login di lebih dari 1 perangkat secara bersamaan.</li>
+                            <li>Gunakan hanya profil yang telah ditentukan untuk Anda.</li>
+                          </ol>
+                          <p>Selamat menikmati layanan Anda!</p>
+                          <hr style="border: 0; border-top: 1px solid #fee2e2; margin: 20px 0;" />
+                          <p style="font-size: 11px; color: #991b1b; text-align: center; margin-bottom: 0;">Email ini dikirim otomatis oleh LanggananYuk Support.</p>
+                        </div>
+                      `
+                    }).catch((err) => console.error("Error sending credentials email:", err));
+                  }
                 }
               }
             }
