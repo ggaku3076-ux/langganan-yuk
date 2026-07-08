@@ -109,14 +109,11 @@ const initialTransactions: Transaction[] = [
 export default function AdminDashboard() {
   // Authentication states
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
   const [isLoadingAuth, setIsLoadingAuth] = useState(false);
 
   const getAuthHeader = () => ({
-    "Authorization": `Bearer ${localStorage.getItem("gexxa_token") || "raihan9898"}`
+    "Authorization": `Bearer ${localStorage.getItem("gexxa_token") || ""}`
   });
 
   // Dashboard states
@@ -154,14 +151,7 @@ export default function AdminDashboard() {
           setIsAuthenticated(false);
         }
       } else {
-        // Support legacy direct log in status
-        const legacyAuth = localStorage.getItem("gexxa_auth") === "true";
-        if (legacyAuth) {
-          setIsAuthenticated(true);
-          localStorage.setItem("gexxa_token", "raihan9898");
-        } else {
-          setIsAuthenticated(false);
-        }
+        setIsAuthenticated(false);
       }
     };
 
@@ -181,11 +171,8 @@ export default function AdminDashboard() {
           setIsAuthenticated(false);
         }
       } else {
-        const legacyAuth = localStorage.getItem("gexxa_auth") === "true";
-        if (!legacyAuth) {
-          setIsAuthenticated(false);
-          localStorage.removeItem("gexxa_token");
-        }
+        setIsAuthenticated(false);
+        localStorage.removeItem("gexxa_token");
       }
     });
 
@@ -280,25 +267,10 @@ export default function AdminDashboard() {
     }
   };
 
-  const handleLogin = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (username === "gexxa" && password === "raihan9898") {
-      setIsAuthenticated(true);
-      setLoginError("");
-      localStorage.setItem("gexxa_auth", "true");
-      localStorage.setItem("gexxa_token", "raihan9898");
-    } else {
-      setLoginError("Username atau Password salah!");
-    }
-  };
-
   const handleLogout = async () => {
     setIsAuthenticated(false);
-    localStorage.removeItem("gexxa_auth");
     localStorage.removeItem("gexxa_token");
     await supabase.auth.signOut();
-    setUsername("");
-    setPassword("");
   };
 
   const handleRefresh = async () => {
@@ -506,40 +478,6 @@ export default function AdminDashboard() {
               </svg>
               {isLoadingAuth ? "Connecting..." : "Masuk dengan Google"}
             </button>
-            
-            <details className="mt-4">
-              <summary className="text-[10px] text-slate-400 text-center font-bold uppercase tracking-wider cursor-pointer list-none hover:text-slate-600 transition-all select-none">
-                Atau gunakan password lokal
-              </summary>
-              <form onSubmit={handleLogin} className="space-y-4 mt-4 pt-4 border-t border-slate-100">
-                <div>
-                  <label className="block text-red-950 text-[10px] font-black uppercase tracking-wider mb-1">Username</label>
-                  <input
-                    type="text"
-                    value={username}
-                    onChange={(e) => setUsername(e.target.value)}
-                    placeholder="Username"
-                    className="w-full bg-slate-50 border-2 border-slate-200 text-red-950 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-600 transition-all font-bold"
-                  />
-                </div>
-                <div>
-                  <label className="block text-red-950 text-[10px] font-black uppercase tracking-wider mb-1">Password</label>
-                  <input
-                    type="password"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
-                    className="w-full bg-slate-50 border-2 border-slate-200 text-red-950 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-600 transition-all font-bold"
-                  />
-                </div>
-                <button
-                  type="submit"
-                  className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2 rounded-xl text-xs transition-all cursor-pointer"
-                >
-                  Buka dengan Password
-                </button>
-              </form>
-            </details>
           </div>
         </div>
 

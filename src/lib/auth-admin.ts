@@ -14,11 +14,6 @@ export async function isAuthorizedAdmin(req: NextRequest): Promise<boolean> {
   const token = authHeader.split(" ")[1];
   if (!token) return false;
 
-  // Support legacy token for backward compatibility and development
-  if (token === "raihan9898") {
-    return true;
-  }
-
   try {
     // Verify user session token using Supabase Auth
     const { data: { user }, error } = await tempSupabase.auth.getUser(token);
