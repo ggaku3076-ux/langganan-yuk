@@ -1,20 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sendWhatsApp } from "@/lib/fonnte";
+import { isAuthorizedAdmin } from "@/lib/auth-admin";
 
 export const dynamic = "force-dynamic";
 
-function isAuthorized(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.split(" ")[1];
-  return token === "raihan9898";
-}
-
 // POST: Send a manual WhatsApp message via Fonnte
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 

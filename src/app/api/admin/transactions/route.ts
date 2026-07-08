@@ -2,23 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
 import { sendWhatsApp } from "@/lib/fonnte";
 import { services, formatRupiah } from "@/data/services";
+import { isAuthorizedAdmin } from "@/lib/auth-admin";
 
 export const dynamic = "force-dynamic";
 
-// Simple authorization check helper
-function isAuthorized(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.split(" ")[1];
-  // Secure check against admin password
-  return token === "raihan9898";
-}
-
 // GET: Fetch all transactions from Supabase
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
@@ -53,7 +43,7 @@ export async function GET(req: NextRequest) {
 
 // POST: Update transaction status manually
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
@@ -174,7 +164,7 @@ export async function POST(req: NextRequest) {
 
 // DELETE: Remove transaction record from log
 export async function DELETE(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 

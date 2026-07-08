@@ -27,6 +27,7 @@ import {
   TrendingUp
 } from "lucide-react";
 import { services, formatRupiah } from "@/data/services";
+import { supabase } from "@/lib/supabase";
 
 // Define mock data matching current checkout flows
 interface Transaction {
@@ -112,6 +113,11 @@ export default function AdminDashboard() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginError, setLoginError] = useState("");
+  const [isLoadingAuth, setIsLoadingAuth] = useState(false);
+
+  const getAuthHeader = () => ({
+    "Authorization": `Bearer ${localStorage.getItem("gexxa_token") || "raihan9898"}`
+  });
 
   // Dashboard states
   const [transactions, setTransactions] = useState<Transaction[]>(initialTransactions);
@@ -131,12 +137,57 @@ export default function AdminDashboard() {
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [isSendingWa, setIsSendingWa] = useState(false);
 
-  // Check authentication status on mount & hide global layout components
+  // Check session and validate email on mount & hide global layout components
   useEffect(() => {
-    const authStatus = localStorage.getItem("gexxa_auth");
-    if (authStatus === "true") {
-      setIsAuthenticated(true);
-    }
+    const checkSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session) {
+        const email = session.user.email;
+        const allowedAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "raihangexxa@gmail.com").toLowerCase();
+        
+        if (email && email.toLowerCase() === allowedAdminEmail) {
+          setIsAuthenticated(true);
+          localStorage.setItem("gexxa_token", session.access_token);
+        } else {
+          await supabase.auth.signOut();
+          setLoginError(`Akses Ditolak: Email ${email} bukan email Admin.`);
+          setIsAuthenticated(false);
+        }
+      } else {
+        // Support legacy direct log in status
+        const legacyAuth = localStorage.getItem("gexxa_auth") === "true";
+        if (legacyAuth) {
+          setIsAuthenticated(true);
+          localStorage.setItem("gexxa_token", "raihan9898");
+        } else {
+          setIsAuthenticated(false);
+        }
+      }
+    };
+
+    checkSession();
+
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (session) {
+        const email = session.user.email;
+        const allowedAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "raihangexxa@gmail.com").toLowerCase();
+        if (email && email.toLowerCase() === allowedAdminEmail) {
+          setIsAuthenticated(true);
+          localStorage.setItem("gexxa_token", session.access_token);
+        } else {
+          await supabase.auth.signOut();
+          setLoginError(`Akses Ditolak: Email ${email} bukan email Admin.`);
+          setIsAuthenticated(false);
+        }
+      } else {
+        const legacyAuth = localStorage.getItem("gexxa_auth") === "true";
+        if (!legacyAuth) {
+          setIsAuthenticated(false);
+          localStorage.removeItem("gexxa_token");
+        }
+      }
+    });
 
     // Hide global website layout elements
     const globalNavbar = document.getElementById("global-navbar");
@@ -148,6 +199,7 @@ export default function AdminDashboard() {
     if (globalFab) globalFab.style.display = "none";
 
     return () => {
+      subscription.unsubscribe();
       // Restore global website layout elements on unmount
       if (globalNavbar) globalNavbar.style.display = "";
       if (globalFooter) globalFooter.style.display = "";
@@ -159,7 +211,7 @@ export default function AdminDashboard() {
     try {
       const response = await fetch("/api/admin/transactions", {
         headers: {
-          "Authorization": "Bearer raihan9898"
+          ...getAuthHeader()
         }
       });
       const data = await response.json();
@@ -181,7 +233,7 @@ export default function AdminDashboard() {
     try {
       const response = await fetch("/api/admin/groups", {
         headers: {
-          "Authorization": "Bearer raihan9898"
+          ...getAuthHeader()
         }
       });
       const data = await response.json();
@@ -208,20 +260,43 @@ export default function AdminDashboard() {
     }
   }, [isAuthenticated]);
 
+  const handleGoogleLogin = async () => {
+    setIsLoadingAuth(true);
+    setLoginError("");
+    try {
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/gexxa`,
+        },
+      });
+      if (error) {
+        setLoginError(error.message);
+      }
+    } catch (err: any) {
+      setLoginError(err.message || "Gagal melakukan login.");
+    } finally {
+      setIsLoadingAuth(false);
+    }
+  };
+
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
     if (username === "gexxa" && password === "raihan9898") {
       setIsAuthenticated(true);
       setLoginError("");
       localStorage.setItem("gexxa_auth", "true");
+      localStorage.setItem("gexxa_token", "raihan9898");
     } else {
       setLoginError("Username atau Password salah!");
     }
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setIsAuthenticated(false);
     localStorage.removeItem("gexxa_auth");
+    localStorage.removeItem("gexxa_token");
+    await supabase.auth.signOut();
     setUsername("");
     setPassword("");
   };
@@ -238,7 +313,7 @@ export default function AdminDashboard() {
         const response = await fetch(`/api/admin/transactions?id=${id}`, {
           method: "DELETE",
           headers: {
-            "Authorization": "Bearer raihan9898"
+            ...getAuthHeader()
           }
         });
         const data = await response.json();
@@ -260,7 +335,7 @@ export default function AdminDashboard() {
         const response = await fetch(`/api/admin/groups?id=${id}`, {
           method: "DELETE",
           headers: {
-            "Authorization": "Bearer raihan9898"
+            ...getAuthHeader()
           }
         });
         const data = await response.json();
@@ -298,7 +373,7 @@ export default function AdminDashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer raihan9898"
+          ...getAuthHeader()
         },
         body: JSON.stringify({ serviceId, maxSlots })
       });
@@ -321,7 +396,7 @@ export default function AdminDashboard() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          "Authorization": "Bearer raihan9898"
+          ...getAuthHeader()
         },
         body: JSON.stringify({ id, status: newStatus })
       });
@@ -397,7 +472,7 @@ export default function AdminDashboard() {
             <p className="text-red-800 text-sm mt-1 text-center font-bold">LayananYuk Admin Security Portal</p>
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-5">
+          <div className="space-y-6">
             {loginError && (
               <div className="p-4 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl font-bold flex items-center gap-2">
                 <span className="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
@@ -405,47 +480,67 @@ export default function AdminDashboard() {
               </div>
             )}
 
-            <div>
-              <label className="block text-red-950 text-xs font-black uppercase tracking-wider mb-2">Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                placeholder="Masukkan username"
-                className="w-full bg-slate-55/30 border-2 border-slate-200 text-red-950 rounded-2xl px-4 py-3 text-sm focus:outline-none focus:border-red-600 transition-all font-bold"
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-red-950 text-xs font-black uppercase tracking-wider mb-2">Password</label>
-              <div className="relative">
-                <input
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="Masukkan password"
-                  className="w-full bg-slate-55/30 border-2 border-slate-200 text-red-950 rounded-2xl pl-4 pr-12 py-3 text-sm focus:outline-none focus:border-red-600 transition-all font-bold"
-                  required
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-red-600 transition-colors cursor-pointer"
-                >
-                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-                </button>
-              </div>
-            </div>
-
             <button
-              type="submit"
-              className="w-full bg-red-600 hover:bg-red-700 active:scale-98 text-white font-bold py-3.5 px-4 rounded-2xl shadow-lg shadow-red-600/10 transition-all cursor-pointer flex items-center justify-center gap-2 text-sm mt-8 border-2 border-red-700"
+              type="button"
+              onClick={handleGoogleLogin}
+              disabled={isLoadingAuth}
+              className="w-full bg-white hover:bg-slate-50 border-2 border-slate-200 hover:border-red-200 active:scale-[0.98] text-slate-700 font-bold py-4 px-4 rounded-2xl shadow-md transition-all cursor-pointer flex items-center justify-center gap-3 text-sm disabled:opacity-50"
             >
-              <Unlock size={18} />
-              Buka Akses Console
+              <svg className="w-5 h-5 flex-shrink-0" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12 5.04c1.62 0 3.08.56 4.22 1.65l3.15-3.15C17.45 1.74 14.93 1 12 1 7.37 1 3.41 3.66 1.48 7.55l3.86 3C6.26 7.55 8.91 5.04 12 5.04z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.27c0-.81-.07-1.59-.2-2.36H12v4.51h6.46c-.29 1.48-1.14 2.73-2.4 3.58l3.76 2.92c2.2-2.03 3.47-5.02 3.47-8.65z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.34 14.5c-.24-.72-.38-1.49-.38-2.3s.14-1.58.38-2.3L1.48 6.9C.54 8.78 0 10.89 0 13s.54 4.22 1.48 6.1l3.86-3.1z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 23c3.24 0 5.97-1.07 7.96-2.91l-3.76-2.92c-1.05.7-2.4 1.13-4.2 1.13-3.09 0-5.74-2.51-6.66-5.51l-3.86 3C3.41 20.34 7.37 23 12 23z"
+                />
+              </svg>
+              {isLoadingAuth ? "Connecting..." : "Masuk dengan Google"}
             </button>
-          </form>
+            
+            <details className="mt-4">
+              <summary className="text-[10px] text-slate-400 text-center font-bold uppercase tracking-wider cursor-pointer list-none hover:text-slate-600 transition-all select-none">
+                Atau gunakan password lokal
+              </summary>
+              <form onSubmit={handleLogin} className="space-y-4 mt-4 pt-4 border-t border-slate-100">
+                <div>
+                  <label className="block text-red-950 text-[10px] font-black uppercase tracking-wider mb-1">Username</label>
+                  <input
+                    type="text"
+                    value={username}
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder="Username"
+                    className="w-full bg-slate-50 border-2 border-slate-200 text-red-950 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-600 transition-all font-bold"
+                  />
+                </div>
+                <div>
+                  <label className="block text-red-950 text-[10px] font-black uppercase tracking-wider mb-1">Password</label>
+                  <input
+                    type="password"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="Password"
+                    className="w-full bg-slate-50 border-2 border-slate-200 text-red-950 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-red-600 transition-all font-bold"
+                  />
+                </div>
+                <button
+                  type="submit"
+                  className="w-full bg-slate-900 hover:bg-slate-950 text-white font-bold py-2 rounded-xl text-xs transition-all cursor-pointer"
+                >
+                  Buka dengan Password
+                </button>
+              </form>
+            </details>
+          </div>
         </div>
 
         {/* Footer info */}
@@ -1171,7 +1266,7 @@ export default function AdminDashboard() {
                       method: "POST",
                       headers: {
                         "Content-Type": "application/json",
-                        "Authorization": "Bearer raihan9898"
+                        ...getAuthHeader()
                       },
                       body: JSON.stringify({
                         target: selectedTrx.whatsapp,

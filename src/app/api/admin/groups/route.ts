@@ -1,20 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { isAuthorizedAdmin } from "@/lib/auth-admin";
 
 export const dynamic = "force-dynamic";
 
-function isAuthorized(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return false;
-  }
-  const token = authHeader.split(" ")[1];
-  return token === "raihan9898";
-}
-
 // GET: Fetch all groups with their service info and transaction members
 export async function GET(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
@@ -51,7 +43,7 @@ export async function GET(req: NextRequest) {
 
 // DELETE: Remove a group from the database
 export async function DELETE(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
@@ -80,7 +72,7 @@ export async function DELETE(req: NextRequest) {
 
 // POST: Create a new group manually
 export async function POST(req: NextRequest) {
-  if (!isAuthorized(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized access" }, { status: 401 });
   }
 
