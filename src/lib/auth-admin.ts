@@ -27,7 +27,7 @@ export async function isAuthorizedAdmin(req: NextRequest): Promise<boolean> {
     }
     
     // Check if the user is the whitelisted admin email
-    const allowedAdminEmail = (process.env.ADMIN_EMAIL || "raihangexxa@gmail.com").toLowerCase();
+    const allowedAdminEmail = (process.env.ADMIN_EMAIL || "rehanalay9@gmail.com").toLowerCase();
     return user.email.toLowerCase() === allowedAdminEmail;
   } catch (err) {
     console.error("Admin authorization check error:", err);

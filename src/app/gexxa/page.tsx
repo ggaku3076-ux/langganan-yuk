@@ -143,7 +143,7 @@ export default function AdminDashboard() {
       const { data: { session } } = await supabase.auth.getSession();
       if (session) {
         const email = session.user.email;
-        const allowedAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "raihangexxa@gmail.com").toLowerCase();
+        const allowedAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "rehanalay9@gmail.com").toLowerCase();
         
         if (email && email.toLowerCase() === allowedAdminEmail) {
           setIsAuthenticated(true);
@@ -171,7 +171,7 @@ export default function AdminDashboard() {
     const { data: { subscription } } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session) {
         const email = session.user.email;
-        const allowedAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "raihangexxa@gmail.com").toLowerCase();
+        const allowedAdminEmail = (process.env.NEXT_PUBLIC_ADMIN_EMAIL || "rehanalay9@gmail.com").toLowerCase();
         if (email && email.toLowerCase() === allowedAdminEmail) {
           setIsAuthenticated(true);
           localStorage.setItem("gexxa_token", session.access_token);
