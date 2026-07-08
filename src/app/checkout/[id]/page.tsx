@@ -17,5 +17,29 @@ export default async function CheckoutPage({ params }: { params: Promise<{ id: s
     notFound();
   }
 
-  return <CheckoutClient service={service} />;
+  // Construct dynamic Product Schema for search engine indexing
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    "name": service.name,
+    "image": service.logoUrl.startsWith("http") ? service.logoUrl : `https://langgananyuk.web.id${service.logoUrl}`,
+    "description": service.description || `Patungan akun premium ${service.name} legal & murah di Indonesia.`,
+    "offers": {
+      "@type": "Offer",
+      "priceCurrency": "IDR",
+      "price": service.sharedPrice,
+      "availability": "https://schema.org/InStock",
+      "url": `https://langgananyuk.web.id/checkout/${service.id}`
+    }
+  };
+
+  return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+      />
+      <CheckoutClient service={service} />
+    </>
+  );
 }

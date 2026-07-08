@@ -15,8 +15,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Langganan Yuk - Patungan Akun Premium",
-  description: "Platform SaaS untuk patungan layanan berlangganan premium.",
+  title: "LanggananYuk - Patungan Akun Premium Netflix, Youtube, Canva Pro Murah",
+  description: "Platform patungan akun premium legal & murah di Indonesia. Dapatkan akses Netflix Premium, YouTube Premium, ChatGPT Plus, Claude Pro, Spotify, Canva Pro mulai dari Rp 15.000/bulan.",
+  keywords: ["patungan netflix", "akun premium murah", "youtube premium murah", "chatgpt plus patungan", "canva pro murah", "spotify premium patungan", "langganan murah"],
   icons: {
     icon: "/favicon.ico?v=2",
   }
@@ -29,6 +30,24 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="id">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "name": "LanggananYuk",
+              "url": "https://langgananyuk.web.id",
+              "logo": "https://langgananyuk.web.id/favicon.ico",
+              "description": "Platform patungan layanan berlangganan premium legal & murah di Indonesia.",
+              "sameAs": [
+                "https://wa.me/6285286502731"
+              ]
+            })
+          }}
+        />
+      </head>
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased bg-white text-red-950 selection:bg-red-600 selection:text-white flex flex-col min-h-screen`}>
         <div id="global-navbar">
           <Navbar />
