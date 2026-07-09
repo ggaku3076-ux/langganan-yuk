@@ -12,6 +12,9 @@ export async function GET(req: NextRequest) {
       SUPABASE_ANON_KEY: process.env.SUPABASE_ANON_KEY ? "Set" : "Missing",
       SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY ? "Set" : "Missing",
       SUPABASE_SERVICE_KEY: process.env.SUPABASE_SERVICE_KEY ? "Set" : "Missing",
+      MIDTRANS_SERVER_KEY: process.env.MIDTRANS_SERVER_KEY ? "Set" : "Missing",
+      NEXT_PUBLIC_MIDTRANS_CLIENT_KEY: process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "Missing",
+      MIDTRANS_IS_PRODUCTION: process.env.MIDTRANS_IS_PRODUCTION || "false",
     },
     tables: {}
   };
