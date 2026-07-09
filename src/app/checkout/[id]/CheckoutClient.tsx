@@ -53,6 +53,7 @@ export default function CheckoutClient({ service }: { service: any }) {
   const [selectedGroup, setSelectedGroup] = useState<any>(null);
   const [createdTransaction, setCreatedTransaction] = useState<any>(null);
   const [midtransRedirectUrl, setMidtransRedirectUrl] = useState<string | null>(null);
+  const [snapToken, setSnapToken] = useState<string | null>(null);
   const [groupsLoading, setGroupsLoading] = useState(true);
   const [groupsError, setGroupsError] = useState<string | null>(null);
 
@@ -141,6 +142,23 @@ export default function CheckoutClient({ service }: { service: any }) {
     return () => clearInterval(timer);
   }, [appState, timeLeft]);
 
+  useEffect(() => {
+    const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "";
+    const isSandbox = clientKey.startsWith("SB-");
+    const scriptUrl = isSandbox
+      ? "https://app.sandbox.midtrans.com/snap/snap.js"
+      : "https://app.midtrans.com/snap/snap.js";
+
+    const existingScript = document.getElementById("midtrans-snap");
+    if (!existingScript) {
+      const script = document.createElement("script");
+      script.src = scriptUrl;
+      script.id = "midtrans-snap";
+      script.setAttribute("data-client-key", clientKey);
+      document.body.appendChild(script);
+    }
+  }, []);
+
   const handleCheckout = async () => {
     if (!selectedGroup) return;
     if (!name.trim() || !whatsapp.trim() || !email.trim()) {
@@ -168,10 +186,30 @@ export default function CheckoutClient({ service }: { service: any }) {
         if (data.success) {
           setCreatedTransaction(data.transaction);
           setMidtransRedirectUrl(data.redirectUrl || null);
+          setSnapToken(data.token || null);
           setTimeLeft(15 * 60);
           setAppState("payment");
-          if (data.redirectUrl) {
-            window.open(data.redirectUrl, "_blank");
+          
+          if (data.token) {
+            const snap = (window as any).snap;
+            if (snap) {
+              snap.pay(data.token, {
+                onSuccess: function(result: any) {
+                  setAppState("waiting");
+                },
+                onPending: function(result: any) {
+                  setAppState("payment");
+                },
+                onError: function(result: any) {
+                  alert("Pembayaran gagal. Silakan coba lagi.");
+                },
+                onClose: function() {
+                  console.log("Customer closed the popup without finishing the payment");
+                }
+              });
+            } else if (data.redirectUrl) {
+              window.open(data.redirectUrl, "_blank");
+            }
           }
         }
       } else {
@@ -512,53 +550,48 @@ export default function CheckoutClient({ service }: { service: any }) {
             <div className="absolute top-0 left-0 w-full h-1 bg-red-600" />
             
             <h2 className="text-xl sm:text-2xl font-bold mb-1.5 text-red-950">Selesaikan Pembayaran</h2>
-            {midtransRedirectUrl ? (
-              <div className="space-y-4 mb-6">
-                <a 
-                  href={midtransRedirectUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="w-full py-4 bg-emerald-600 hover:bg-emerald-700 text-white font-black rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all active:scale-[0.98] cursor-pointer"
-                >
-                  <QrCode size={18} />
-                  Bayar Sekarang (Midtrans)
-                </a>
-                <p className="text-[10px] text-slate-500 font-medium leading-relaxed px-4">
-                  Didukung oleh Midtrans. Klik tombol di atas untuk membayar secara instan menggunakan QRIS, Gopay, OVO, Dana, ShopeePay, atau Virtual Account Bank.
-                </p>
-              </div>
-            ) : (
-              <>
-                <p className="text-red-750 text-xs sm:text-sm mb-6 sm:mb-8 font-semibold">Scan kode QR di bawah ini.</p>
-                <div className="bg-white p-3 sm:p-4 rounded-2xl inline-block mb-6 sm:mb-8 border border-red-100 shadow-sm">
-                  <div className="w-40 h-40 sm:w-48 sm:h-48 border border-red-50 rounded-xl flex items-center justify-center bg-white">
-                    {isLoading ? (
-                      <Loader2 size={32} className="text-red-300 animate-spin" />
-                    ) : (
-                      <QrCode size={160} className="text-red-950" strokeWidth={1.2} />
-                    )}
-                  </div>
-                </div>
-              </>
-            )}
+            <div className="space-y-4 mb-6">
+              <button 
+                onClick={() => {
+                  const snap = (window as any).snap;
+                  if (snap && snapToken) {
+                    snap.pay(snapToken, {
+                      onSuccess: function(result: any) {
+                        setAppState("waiting");
+                      },
+                      onPending: function(result: any) {
+                        setAppState("payment");
+                      },
+                      onError: function(result: any) {
+                        alert("Pembayaran gagal. Silakan coba lagi.");
+                      },
+                      onClose: function() {
+                        console.log("Customer closed the popup without finishing the payment");
+                      }
+                    });
+                  } else if (midtransRedirectUrl) {
+                    window.open(midtransRedirectUrl, "_blank");
+                  }
+                }}
+                className="w-full py-4 bg-red-600 hover:bg-red-700 text-white font-black rounded-xl text-sm sm:text-base flex items-center justify-center gap-2 shadow-lg shadow-red-650/20 transition-all active:scale-[0.98] cursor-pointer"
+              >
+                <QrCode size={18} />
+                Bayar Sekarang
+              </button>
+              <p className="text-[10px] text-slate-500 font-medium leading-relaxed px-4">
+                Selesaikan pembayaran secara instan menggunakan QRIS, Gopay, OVO, Dana, ShopeePay, atau Virtual Account Bank.
+              </p>
+            </div>
             
             <div className="mb-6 sm:mb-8">
               <p className="text-[10px] sm:text-xs text-red-700 font-bold mb-1 uppercase tracking-wider">Total Tagihan</p>
               <p className="text-2xl sm:text-3xl font-bold text-red-650">{formatRupiah(currentPrice)}</p>
             </div>
 
-            <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-4 rounded-full mb-6 sm:mb-8 mx-auto border border-red-100 w-auto max-w-full">
-              <AlertCircle size={14} className="text-red-600 flex-shrink-0" />
+            <div className="flex items-center justify-center gap-1.5 text-[10px] sm:text-xs font-bold text-red-700 bg-red-50 py-2.5 px-4 rounded-full mb-2 mx-auto border border-red-100 w-auto max-w-full">
+              <AlertCircle size={14} className="text-red-650 flex-shrink-0" />
               <span>Batas Waktu: <span className="text-red-600 font-bold">{Math.floor(timeLeft / 60)}:{String(timeLeft % 60).padStart(2, '0')}</span></span>
             </div>
-
-            <button 
-              onClick={handlePayment}
-              disabled={isLoading}
-              className="w-full py-3.5 text-xs sm:text-sm font-bold border border-red-100 text-red-950 hover:bg-red-50 rounded-xl transition-all active:scale-95 disabled:opacity-50"
-            >
-              {isLoading ? "Memverifikasi..." : "[Simulasi] Konfirmasi Pembayaran"}
-            </button>
           </div>
         </div>
       )}
