@@ -27,14 +27,14 @@ export const services: Service[] = [
     category: "Entertainment",
     logoUrl: "https://upload.wikimedia.org/wikipedia/commons/0/08/Netflix_2015_logo.svg",
     originalPrice: 186000,
-    sharedPrice: 50000,
+    sharedPrice: 1000,
     totalSlots: 4,
     filledSlots: 3,
     description: "Kualitas streaming tertinggi Ultra HD (4K) dan HDR, dukungan Audio Spasial Netflix (Dolby Atmos), serta menonton hingga di 4 perangkat secara bersamaan tanpa iklan.",
     options: [
-      { id: "2-user", label: "2 User", price: 96500, slots: 2 },
-      { id: "4-user", label: "4 User", price: 50000, slots: 4, isDefault: true },
-      { id: "5-user", label: "5 User", price: 40000, slots: 5 }
+      { id: "2-user", label: "2 User", price: 1000, slots: 2 },
+      { id: "4-user", label: "4 User", price: 1000, slots: 4, isDefault: true },
+      { id: "5-user", label: "5 User", price: 1000, slots: 5 }
     ]
   },
   {
