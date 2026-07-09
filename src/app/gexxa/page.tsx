@@ -126,6 +126,16 @@ export default function AdminDashboard() {
   const [showCredentialsModal, setShowCredentialsModal] = useState(false);
   const [selectedTrx, setSelectedTrx] = useState<Transaction | null>(null);
 
+  // Credentials/Stok states
+  const [showCredsModal, setShowCredsModal] = useState(false);
+  const [selectedServiceForCreds, setSelectedServiceForCreds] = useState<string | null>(null);
+  const [allCreds, setAllCreds] = useState<any[]>([]);
+  const [credsLoading, setCredsLoading] = useState(false);
+  const [newCredEmail, setNewCredEmail] = useState("");
+  const [newCredPassword, setNewCredPassword] = useState("");
+  const [newCredProfile, setNewCredProfile] = useState<number>(1);
+  const [newCredPin, setNewCredPin] = useState("");
+
   // Tab state: "transactions" | "grup" | "inventory"
   const [activeTab, setActiveTab] = useState<"transactions" | "grup" | "inventory">("transactions");
 
@@ -241,11 +251,97 @@ export default function AdminDashboard() {
     }
   };
 
+  const fetchAllCredentials = async () => {
+    try {
+      const response = await fetch("/api/admin/credentials", {
+        headers: {
+          ...getAuthHeader()
+        }
+      });
+      const data = await response.json();
+      if (response.ok && data.credentials) {
+        setAllCreds(data.credentials);
+      }
+    } catch (err) {
+      console.error("Error fetching credentials:", err);
+    }
+  };
+
+  const handleAddCred = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedServiceForCreds) return;
+    if (!newCredEmail.trim() || !newCredPassword.trim() || !newCredProfile) {
+      alert("Harap isi Email, Password, dan Nomor Profil!");
+      return;
+    }
+
+    setCredsLoading(true);
+    try {
+      const response = await fetch("/api/admin/credentials", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          ...getAuthHeader()
+        },
+        body: JSON.stringify({
+          serviceId: selectedServiceForCreds,
+          email: newCredEmail.trim(),
+          password: newCredPassword.trim(),
+          profileNumber: newCredProfile,
+          profilePin: newCredPin.trim() || null
+        })
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        setNewCredEmail("");
+        setNewCredPassword("");
+        setNewCredProfile(1);
+        setNewCredPin("");
+        await fetchAllCredentials();
+      } else {
+        alert(`Gagal menambah kredensial: ${data.error}`);
+      }
+    } catch (err: any) {
+      console.error("Error adding credential:", err);
+      alert("Gagal menambah kredensial.");
+    } finally {
+      setCredsLoading(false);
+    }
+  };
+
+  const handleDeleteCred = async (id: string) => {
+    if (!confirm("Apakah Anda yakin ingin menghapus data stok akun ini?")) return;
+
+    setCredsLoading(true);
+    try {
+      const response = await fetch(`/api/admin/credentials?id=${id}`, {
+        method: "DELETE",
+        headers: {
+          ...getAuthHeader()
+        }
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        await fetchAllCredentials();
+      } else {
+        alert(`Gagal menghapus kredensial: ${data.error}`);
+      }
+    } catch (err: any) {
+      console.error("Error deleting credential:", err);
+      alert("Gagal menghapus kredensial.");
+    } finally {
+      setCredsLoading(false);
+    }
+  };
+
   // Fetch data once authenticated
   useEffect(() => {
     if (isAuthenticated) {
       fetchTransactions();
       fetchGroupsList();
+      fetchAllCredentials();
     }
   }, [isAuthenticated]);
 
@@ -277,7 +373,7 @@ export default function AdminDashboard() {
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
-    await Promise.all([fetchTransactions(), fetchGroupsList()]);
+    await Promise.all([fetchTransactions(), fetchGroupsList(), fetchAllCredentials()]);
     setIsRefreshing(false);
   };
 
@@ -1145,10 +1241,13 @@ export default function AdminDashboard() {
                   <div className="border-t border-slate-100 mt-6 pt-4 flex items-center justify-between text-xs">
                     <span className="text-slate-450 font-bold flex items-center gap-1">
                       <Key size={13} className="text-red-500" />
-                      Stok Akun Aktif: <strong className="text-red-950 font-black">12 Ready</strong>
+                      Stok Akun Aktif: <strong className="text-red-950 font-black">{allCreds.filter((c: any) => c.service_id === svc.id && !c.is_used).length} Ready</strong>
                     </span>
                     <button 
-                      onClick={() => alert("Mengalihkan ke pengaturan stok akun premium di Supabase.")}
+                      onClick={() => {
+                        setSelectedServiceForCreds(svc.id);
+                        setShowCredsModal(true);
+                      }}
                       className="text-red-600 font-black hover:underline cursor-pointer flex items-center gap-0.5"
                     >
                       Kelola Akun <ChevronRight size={14} />
@@ -1308,6 +1407,140 @@ export default function AdminDashboard() {
               >
                 Batalkan
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* STOCK / CREDENTIALS MANAGEMENT MODAL */}
+      {showCredsModal && selectedServiceForCreds && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div className="w-full max-w-2xl bg-white border border-red-100 rounded-3xl p-6 shadow-2xl relative max-h-[85vh] flex flex-col">
+            <button 
+              onClick={() => { setShowCredsModal(false); setSelectedServiceForCreds(null); }}
+              className="absolute top-4 right-4 text-slate-400 hover:text-slate-650 font-black text-lg p-1.5 cursor-pointer"
+            >
+              ✕
+            </button>
+            
+            <h3 className="text-lg font-black text-red-950 mb-1">
+              Kelola Stok Akun: {services.find(s => s.id === selectedServiceForCreds)?.name}
+            </h3>
+            <p className="text-xs text-slate-500 mb-4">
+              Tambahkan dan kelola stok akun premium yang siap dibagikan secara otomatis ketika grup patungan penuh.
+            </p>
+
+            {/* Form Tambah Stok */}
+            <form onSubmit={handleAddCred} className="bg-slate-50 border border-slate-200 p-4 rounded-2xl mb-6 grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div>
+                <label className="block text-[9px] uppercase font-black text-slate-500 mb-1">Email Akun</label>
+                <input 
+                  type="email"
+                  required
+                  value={newCredEmail}
+                  onChange={(e) => setNewCredEmail(e.target.value)}
+                  placeholder="nama-akun@premium.com"
+                  className="w-full bg-white border border-slate-200 p-2.5 rounded-xl font-bold focus:outline-none focus:border-red-600 transition-all text-slate-800"
+                />
+              </div>
+              <div>
+                <label className="block text-[9px] uppercase font-black text-slate-500 mb-1">Password</label>
+                <input 
+                  type="text"
+                  required
+                  value={newCredPassword}
+                  onChange={(e) => setNewCredPassword(e.target.value)}
+                  placeholder="Password123!"
+                  className="w-full bg-white border border-slate-200 p-2.5 rounded-xl font-bold focus:outline-none focus:border-red-600 transition-all text-slate-800"
+                />
+              </div>
+              <div>
+                <label className="block text-[9px] uppercase font-black text-slate-500 mb-1">Nomor Profil (1-5)</label>
+                <select
+                  value={newCredProfile}
+                  onChange={(e) => setNewCredProfile(Number(e.target.value))}
+                  className="w-full bg-white border border-slate-200 p-2.5 rounded-xl font-bold focus:outline-none focus:border-red-600 transition-all text-slate-800"
+                >
+                  <option value={1}>Profil 1</option>
+                  <option value={2}>Profil 2</option>
+                  <option value={3}>Profil 3</option>
+                  <option value={4}>Profil 4</option>
+                  <option value={5}>Profil 5</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-[9px] uppercase font-black text-slate-500 mb-1">PIN Profil (Opsional)</label>
+                <input 
+                  type="text"
+                  value={newCredPin}
+                  onChange={(e) => setNewCredPin(e.target.value)}
+                  placeholder="Ketik PIN jika ada"
+                  className="w-full bg-white border border-slate-200 p-2.5 rounded-xl font-bold focus:outline-none focus:border-red-600 transition-all text-slate-800"
+                />
+              </div>
+              <div className="sm:col-span-2 pt-2">
+                <button 
+                  type="submit"
+                  disabled={credsLoading}
+                  className="w-full bg-red-600 hover:bg-red-700 active:scale-[0.98] text-white font-black py-3 rounded-xl border border-red-700 shadow shadow-red-600/10 cursor-pointer disabled:opacity-50 transition-all flex items-center justify-center gap-1.5"
+                >
+                  {credsLoading ? "Menyimpan..." : "Tambah Stok Akun"}
+                </button>
+              </div>
+            </form>
+
+            {/* List Stok Saat Ini */}
+            <div className="flex-1 overflow-y-auto">
+              <h4 className="text-xs font-black text-slate-700 mb-2 uppercase tracking-wide">Daftar Stok Saat Ini</h4>
+              <div className="border border-slate-200 rounded-2xl overflow-hidden">
+                <table className="w-full text-[11px] text-left border-collapse">
+                  <thead className="bg-slate-100 text-slate-650 font-black border-b border-slate-200 uppercase text-[9px]">
+                    <tr>
+                      <th className="p-3">Email & Password</th>
+                      <th className="p-3">Profil & PIN</th>
+                      <th className="p-3">Status</th>
+                      <th className="p-3 text-right">Aksi</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100 bg-white font-semibold text-slate-800">
+                    {allCreds.filter((c: any) => c.service_id === selectedServiceForCreds).length === 0 ? (
+                      <tr>
+                        <td colSpan={4} className="p-6 text-center text-slate-400 font-bold">Belum ada stok dimasukkan.</td>
+                      </tr>
+                    ) : (
+                      allCreds.filter((c: any) => c.service_id === selectedServiceForCreds).map((c: any) => (
+                        <tr key={c.id} className="hover:bg-slate-50/50">
+                          <td className="p-3">
+                            <p className="font-bold text-red-950 truncate max-w-[180px]">{c.email}</p>
+                            <p className="text-[10px] text-slate-400 font-mono select-all">Pass: {c.password}</p>
+                          </td>
+                          <td className="p-3">
+                            <p className="font-bold text-slate-850">Profil {c.profile_number}</p>
+                            <p className="text-[10px] text-slate-400">PIN: {c.profile_pin || "Tanpa PIN"}</p>
+                          </td>
+                          <td className="p-3">
+                            {c.is_used ? (
+                              <span className="inline-block px-2 py-0.5 bg-slate-100 border border-slate-200 text-slate-600 rounded font-black text-[9px]">Terpakai</span>
+                            ) : (
+                              <span className="inline-block px-2 py-0.5 bg-emerald-50 border border-emerald-100 text-emerald-700 rounded font-black text-[9px]">Tersedia</span>
+                            )}
+                          </td>
+                          <td className="p-3 text-right">
+                            <button 
+                              type="button"
+                              onClick={() => handleDeleteCred(c.id)}
+                              className="p-1.5 text-slate-400 hover:text-red-650 transition-colors cursor-pointer"
+                              title="Hapus Kredensial"
+                            >
+                              <Trash2 size={14} />
+                            </button>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
             </div>
           </div>
         </div>

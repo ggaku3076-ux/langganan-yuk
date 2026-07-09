@@ -20,6 +20,7 @@ export default function Navbar() {
   const links = [
     { name: "Home", path: "/" },
     { name: "Layanan", path: "/layanan" },
+    { name: "Lacak Pembelian", path: "/lacak" },
     { name: "FAQ", path: "/faq" },
     { name: "Contact", path: "/contact" },
   ];
