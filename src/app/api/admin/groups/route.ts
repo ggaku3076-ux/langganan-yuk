@@ -23,6 +23,7 @@ export async function GET(req: NextRequest) {
           id,
           buyer_name,
           whatsapp_number,
+          buyer_email,
           status,
           price,
           timestamp,
