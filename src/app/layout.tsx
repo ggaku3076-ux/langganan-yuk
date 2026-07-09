@@ -19,7 +19,14 @@ export const metadata: Metadata = {
   description: "Platform patungan akun premium legal & murah di Indonesia. Dapatkan akses Netflix Premium, YouTube Premium, ChatGPT Plus, Claude Pro, Spotify, Canva Pro mulai dari Rp 15.000/bulan.",
   keywords: ["patungan netflix", "akun premium murah", "youtube premium murah", "chatgpt plus patungan", "canva pro murah", "spotify premium patungan", "langganan murah"],
   icons: {
-    icon: "/favicon.ico?v=2",
+    icon: [
+      { url: "/favicon.ico?v=3" },
+      { url: "/logo-emblem.png", sizes: "192x192", type: "image/png" }
+    ],
+    shortcut: "/favicon.ico?v=3",
+    apple: [
+      { url: "/logo-emblem.png", sizes: "180x180", type: "image/png" }
+    ]
   }
 };
 
