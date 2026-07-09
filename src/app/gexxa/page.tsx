@@ -135,6 +135,18 @@ export default function AdminDashboard() {
   const [newCredPassword, setNewCredPassword] = useState("");
   const [newCredProfile, setNewCredProfile] = useState<number>(1);
   const [newCredPin, setNewCredPin] = useState("");
+  const [selectedCredId, setSelectedCredId] = useState<string>("");
+
+  useEffect(() => {
+    if (selectedTrx) {
+      const firstAvailable = allCreds.find(
+        (c) => c.service_id === selectedTrx.serviceId && !c.is_used
+      );
+      setSelectedCredId(firstAvailable ? firstAvailable.id : "");
+    } else {
+      setSelectedCredId("");
+    }
+  }, [selectedTrx, allCreds]);
 
   // Tab state: "transactions" | "grup" | "inventory"
   const [activeTab, setActiveTab] = useState<"transactions" | "grup" | "inventory">("transactions");
@@ -1277,21 +1289,39 @@ export default function AdminDashboard() {
             <div className="space-y-4">
               <div>
                 <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Pilih Stok Akun Aktif</label>
-                <div className="p-3.5 bg-slate-50 border border-slate-200 rounded-2xl flex justify-between items-center text-xs">
-                  <div>
-                    <span className="font-black text-slate-800">netflix-indo-premium43@gmail.com</span>
-                    <p className="text-[10px] text-slate-500 mt-0.5">Password: IndoPrem332! &bull; Profile: 4</p>
+                {allCreds.filter((c: any) => c.service_id === selectedTrx.serviceId && !c.is_used).length === 0 ? (
+                  <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl font-bold flex items-center gap-1.5 animate-pulse">
+                    ⚠️ Stok akun habis! Silakan tambah stok terlebih dahulu di tab produk.
                   </div>
-                  <span className="bg-emerald-50 text-emerald-700 border border-emerald-200 text-[9px] font-black px-1.5 py-0.5 rounded shadow-sm">Ready</span>
-                </div>
+                ) : (
+                  <select
+                    value={selectedCredId}
+                    onChange={(e) => setSelectedCredId(e.target.value)}
+                    className="w-full bg-slate-50 border border-slate-200 p-3 rounded-2xl font-bold text-xs focus:outline-none focus:border-red-600 text-slate-800"
+                  >
+                    {allCreds
+                      .filter((c: any) => c.service_id === selectedTrx.serviceId && !c.is_used)
+                      .map((c: any) => (
+                        <option key={c.id} value={c.id}>
+                          {c.email} (Profil {c.profile_number} {c.profile_pin ? "- PIN: " + c.profile_pin : ""})
+                        </option>
+                      ))}
+                  </select>
+                )}
               </div>
 
+              {/* Draft Message (computed based on selectedCredId) */}
               <div>
                 <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Draft Pesan Akun</label>
                 <textarea
                   readOnly
                   rows={5}
-                  value={`Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${services.find(s => s.id === selectedTrx.serviceId)?.name} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: netflix-indo-premium43@gmail.com\n- Password: IndoPrem332!\n- Profil Penggunaan: Profil 4 / User 4\n- PIN Profil: 9912\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`}
+                  value={(() => {
+                    const activeCred = allCreds.find((c: any) => c.id === selectedCredId);
+                    if (!activeCred) return "Silakan tambah/pilih stok akun terlebih dahulu.";
+                    const svcName = services.find(s => s.id === selectedTrx.serviceId)?.name || selectedTrx.serviceId;
+                    return `Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${svcName} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: ${activeCred.email}\n- Password: ${activeCred.password}\n- Profil Penggunaan: Profil ${activeCred.profile_number}\n- PIN Profil: ${activeCred.profile_pin || "Tanpa PIN"}\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`;
+                  })()}
                   className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-2xl p-4 focus:outline-none font-bold leading-relaxed shadow-inner"
                 />
               </div>
@@ -1300,6 +1330,11 @@ export default function AdminDashboard() {
             <div className="flex flex-col gap-2 mt-6">
               <button
                 onClick={async () => {
+                  const activeCred = allCreds.find((c: any) => c.id === selectedCredId);
+                  if (!activeCred) {
+                    alert("Silakan pilih stok akun terlebih dahulu!");
+                    return;
+                  }
                   if (!selectedTrx.email) {
                     alert("Pelanggan ini tidak memasukkan email saat checkout!");
                     return;
@@ -1314,10 +1349,10 @@ export default function AdminDashboard() {
                         <div style="background-color: #fef2f2; padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid #fee2e2;">
                           <h3 style="margin-top: 0; color: #991b1b; font-size: 16px;">Detail Akun Premium Anda:</h3>
                           <ul style="list-style: none; padding-left: 0; margin-bottom: 0; line-height: 1.6;">
-                            <li><strong>Email Akun:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">netflix-indo-premium43@gmail.com</code></li>
-                            <li><strong>Password:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">IndoPrem332!</code></li>
-                            <li><strong>Profil:</strong> Profil 4</li>
-                            <li><strong>PIN Profil:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">9912</code></li>
+                            <li><strong>Email Akun:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${activeCred.email}</code></li>
+                            <li><strong>Password:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${activeCred.password}</code></li>
+                            <li><strong>Profil:</strong> Profil ${activeCred.profile_number}</li>
+                            <li><strong>PIN Profil:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${activeCred.profile_pin || "Tanpa PIN"}</code></li>
                           </ul>
                         </div>
                         <h4 style="color: #991b1b; margin-bottom: 5px;">Syarat & Ketentuan:</h4>
@@ -1347,7 +1382,21 @@ export default function AdminDashboard() {
 
                     const data = await response.json();
                     if (response.ok) {
-                      alert(`Kredensial berhasil dikirim via Resend Email ke ${selectedTrx.email}!`);
+                      // Mark credential as used
+                      await fetch("/api/admin/credentials", {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          ...getAuthHeader()
+                        },
+                        body: JSON.stringify({
+                          id: selectedCredId,
+                          isUsed: true
+                        })
+                      });
+                      
+                      alert(`Kredensial berhasil dikirim via Resend Email ke ${selectedTrx.email}! Stok telah ditandai terpakai.`);
+                      await fetchAllCredentials();
                       setShowCredentialsModal(false);
                     } else {
                       alert(`Gagal mengirim Email: ${data.error}`);
@@ -1359,17 +1408,24 @@ export default function AdminDashboard() {
                     setIsSendingEmail(false);
                   }
                 }}
-                disabled={isSendingEmail || !selectedTrx.email}
-                className="w-full bg-red-650 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200 text-white font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-red-650/10"
+                disabled={isSendingEmail || !selectedTrx.email || !selectedCredId}
+                className="w-full bg-red-650 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200 text-white font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-red-655/10"
               >
                 {isSendingEmail ? "Mengirim..." : "Kirim via Resend Email"}
               </button>
 
               <button
                 onClick={async () => {
+                  const activeCred = allCreds.find((c: any) => c.id === selectedCredId);
+                  if (!activeCred) {
+                    alert("Silakan pilih stok akun terlebih dahulu!");
+                    return;
+                  }
                   setIsSendingWa(true);
                   try {
-                    const msgText = `Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${services.find(s => s.id === selectedTrx.serviceId)?.name} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: netflix-indo-premium43@gmail.com\n- Password: IndoPrem332!\n- Profil Penggunaan: Profil 4 / User 4\n- PIN Profil: 9912\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`;
+                    const svcName = services.find(s => s.id === selectedTrx.serviceId)?.name || selectedTrx.serviceId;
+                    const msgText = `Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${svcName} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: ${activeCred.email}\n- Password: ${activeCred.password}\n- Profil Penggunaan: Profil ${activeCred.profile_number}\n- PIN Profil: ${activeCred.profile_pin || "Tanpa PIN"}\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`;
+                    
                     const response = await fetch("/api/admin/send-wa", {
                       method: "POST",
                       headers: {
@@ -1383,7 +1439,21 @@ export default function AdminDashboard() {
                     });
                     const data = await response.json();
                     if (response.ok) {
-                      alert(`Kredensial berhasil dikirim via WhatsApp ke ${selectedTrx.whatsapp}!`);
+                      // Mark credential as used
+                      await fetch("/api/admin/credentials", {
+                        method: "PUT",
+                        headers: {
+                          "Content-Type": "application/json",
+                          ...getAuthHeader()
+                        },
+                        body: JSON.stringify({
+                          id: selectedCredId,
+                          isUsed: true
+                        })
+                      });
+
+                      alert(`Kredensial berhasil dikirim via WhatsApp ke ${selectedTrx.whatsapp}! Stok telah ditandai terpakai.`);
+                      await fetchAllCredentials();
                       setShowCredentialsModal(false);
                     } else {
                       alert(`Gagal mengirim WA: ${data.error}`);
@@ -1395,7 +1465,7 @@ export default function AdminDashboard() {
                     setIsSendingWa(false);
                   }
                 }}
-                disabled={isSendingWa}
+                disabled={isSendingWa || !selectedCredId}
                 className="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
               >
                 {isSendingWa ? "Mengirim..." : "Kirim via WhatsApp (Backup)"}
