@@ -3,6 +3,9 @@ import { supabaseAdmin } from "@/lib/supabase-admin";
 import { sendWhatsApp } from "@/lib/fonnte";
 import { services, formatRupiah } from "@/data/services";
 import { isAuthorizedAdmin } from "@/lib/auth-admin";
+import { Resend } from "resend";
+
+const resend = new Resend(process.env.RESEND_API_KEY || "re_placeholder");
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +29,7 @@ export async function GET(req: NextRequest) {
       id: t.id,
       name: t.buyer_name,
       whatsapp: t.whatsapp_number,
+      email: t.buyer_email,
       serviceId: t.service_id,
       optionLabel: t.option_label,
       price: Number(t.price),
@@ -129,26 +133,45 @@ export async function POST(req: NextRequest) {
               // Fetch all successful buyers in this group to notify them
               const { data: groupBuyers } = await supabaseAdmin
                 .from("transactions")
-                .select("whatsapp_number, buyer_name")
+                .select("whatsapp_number, buyer_name, buyer_email")
                 .eq("group_id", trx.group_id)
                 .eq("status", "SUCCESS");
 
               if (groupBuyers && groupBuyers.length > 0) {
-                // Send credentials to all buyers in this group
-                groupBuyers.forEach((buyer, idx) => {
-                  const profileInfo = credential.profile_number
-                    ? `Profil ${credential.profile_number}`
-                    : `Profil ${idx + 1}`;
-                  const pinInfo = credential.pin_code
-                    ? `\n- PIN Profil: ${credential.pin_code}`
-                    : "";
-
-                  const credMessage = `Halo ${buyer.buyer_name},\n\nGrup patungan *${trx.group_id}* untuk *${svcName}* Anda kini telah PENUH (4/4)! 🎉\n\nBerikut kredensial akun premium Anda:\n- Email: ${credential.email}\n- Password: ${credential.password}\n- Opsi/Slot: ${profileInfo}${pinInfo}\n\nHarap dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nSelamat menikmati!\nLanggananYuk Support`;
-
-                  sendWhatsApp(buyer.whatsapp_number, credMessage).catch((err) =>
-                    console.error(`Error sending credentials WA to ${buyer.buyer_name}:`, err)
-                  );
-                });
+                // Send credentials to all buyers in this group via email
+                for (const buyer of groupBuyers) {
+                  if (buyer.buyer_email) {
+                    resend.emails.send({
+                      from: "LanggananYuk <noreply@langgananyuk.web.id>",
+                      to: buyer.buyer_email,
+                      subject: `Kredensial Akun Premium ${svcName} Anda! 🎉`,
+                      html: `
+                        <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #fee2e2; border-radius: 20px;">
+                          <h2 style="color: #991b1b; margin-top: 0;">Halo ${buyer.buyer_name},</h2>
+                          <p>Kabar baik! Grup patungan <strong>${svcName}</strong> Anda telah penuh (4/4) dan sudah aktif. 🚀</p>
+                          <div style="background-color: #fef2f2; padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid #fee2e2;">
+                            <h3 style="margin-top: 0; color: #991b1b; font-size: 16px;">Detail Akun Premium Anda:</h3>
+                            <ul style="list-style: none; padding-left: 0; margin-bottom: 0; line-height: 1.6;">
+                              <li><strong>Email Akun:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${credential.email}</code></li>
+                              <li><strong>Password:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${credential.password}</code></li>
+                              <li><strong>Profil:</strong> Profil ${credential.profile_number || "Bebas"}</li>
+                              <li><strong>PIN Profil:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${credential.profile_pin || "Tanpa PIN"}</code></li>
+                            </ul>
+                          </div>
+                          <h4 style="color: #991b1b; margin-bottom: 5px;">Syarat & Ketentuan:</h4>
+                          <ol style="margin-top: 0; padding-left: 20px; line-height: 1.6;">
+                            <li>Dilarang mengubah email/password akun.</li>
+                            <li>Dilarang login di lebih dari 1 perangkat secara bersamaan.</li>
+                            <li>Gunakan hanya profil yang telah ditentukan untuk Anda.</li>
+                          </ol>
+                          <p>Selamat menikmati layanan Anda!</p>
+                          <hr style="border: 0; border-top: 1px solid #fee2e2; margin: 20px 0;" />
+                          <p style="font-size: 11px; color: #991b1b; text-align: center; margin-bottom: 0;">Email ini dikirim otomatis oleh LanggananYuk Support.</p>
+                        </div>
+                      `
+                    }).catch((err) => console.error(`Error sending credentials email to ${buyer.buyer_name}:`, err));
+                  }
+                }
               }
             }
           }

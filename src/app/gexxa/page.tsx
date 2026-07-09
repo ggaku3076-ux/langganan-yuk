@@ -34,6 +34,7 @@ interface Transaction {
   id: string;
   name: string;
   whatsapp: string;
+  email?: string;
   serviceId: string;
   optionLabel: string;
   price: number;
@@ -133,6 +134,7 @@ export default function AdminDashboard() {
   const [selectedServiceForGroups, setSelectedServiceForGroups] = useState<string>("netflix");
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [isSendingWa, setIsSendingWa] = useState(false);
+  const [isSendingEmail, setIsSendingEmail] = useState(false);
 
   // Check session and validate email on mount & hide global layout components
   useEffect(() => {
@@ -1161,9 +1163,14 @@ export default function AdminDashboard() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
           <div className="w-full max-w-md bg-white border border-red-100 rounded-3xl p-6 shadow-2xl relative">
             <h3 className="text-lg font-black text-red-950 mb-2">Kirim Akun ke Pembeli</h3>
-            <p className="text-xs text-slate-500 mb-6">
-              Kirim kredensial layanan patungan **{services.find(s => s.id === selectedTrx.serviceId)?.name}** langsung ke nomor **{selectedTrx.whatsapp}** ({selectedTrx.name}).
+            <p className="text-xs text-slate-500 mb-4">
+              Kirim kredensial layanan patungan **{services.find(s => s.id === selectedTrx.serviceId)?.name}** ke pelanggan ({selectedTrx.name}).
             </p>
+
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-3.5 mb-4 text-xs font-bold text-slate-700 space-y-1 shadow-inner">
+              <p>📞 WhatsApp: <span className="text-red-950 font-black">{selectedTrx.whatsapp}</span></p>
+              <p>✉️ Email: <span className="text-red-950 font-black">{selectedTrx.email || "Belum Mengisi Email"}</span></p>
+            </div>
 
             <div className="space-y-4">
               <div>
@@ -1178,23 +1185,84 @@ export default function AdminDashboard() {
               </div>
 
               <div>
-                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Draft Pesan WhatsApp</label>
+                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Draft Pesan Akun</label>
                 <textarea
                   readOnly
-                  rows={6}
+                  rows={5}
                   value={`Halo ${selectedTrx.name},\n\nPembayaran Anda untuk patungan ${services.find(s => s.id === selectedTrx.serviceId)?.name} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: netflix-indo-premium43@gmail.com\n- Password: IndoPrem332!\n- Profil Penggunaan: Profil 4 / User 4\n- PIN Profil: 9912\n\nMohon dilarang mengubah password/kredensial agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`}
                   className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-2xl p-4 focus:outline-none font-bold leading-relaxed shadow-inner"
                 />
               </div>
             </div>
 
-            <div className="flex gap-3 mt-6">
+            <div className="flex flex-col gap-2 mt-6">
               <button
-                onClick={() => setShowCredentialsModal(false)}
-                className="w-1/2 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all"
+                onClick={async () => {
+                  if (!selectedTrx.email) {
+                    alert("Pelanggan ini tidak memasukkan email saat checkout!");
+                    return;
+                  }
+                  setIsSendingEmail(true);
+                  try {
+                    const svcName = services.find(s => s.id === selectedTrx.serviceId)?.name || selectedTrx.serviceId;
+                    const htmlContent = `
+                      <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #fee2e2; border-radius: 20px;">
+                        <h2 style="color: #991b1b; margin-top: 0;">Halo ${selectedTrx.name},</h2>
+                        <p>Kabar baik! Kredensial akun premium <strong>${svcName}</strong> Anda telah aktif. 🚀</p>
+                        <div style="background-color: #fef2f2; padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid #fee2e2;">
+                          <h3 style="margin-top: 0; color: #991b1b; font-size: 16px;">Detail Akun Premium Anda:</h3>
+                          <ul style="list-style: none; padding-left: 0; margin-bottom: 0; line-height: 1.6;">
+                            <li><strong>Email Akun:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">netflix-indo-premium43@gmail.com</code></li>
+                            <li><strong>Password:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">IndoPrem332!</code></li>
+                            <li><strong>Profil:</strong> Profil 4</li>
+                            <li><strong>PIN Profil:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">9912</code></li>
+                          </ul>
+                        </div>
+                        <h4 style="color: #991b1b; margin-bottom: 5px;">Syarat & Ketentuan:</h4>
+                        <ol style="margin-top: 0; padding-left: 20px; line-height: 1.6;">
+                          <li>Dilarang mengubah email/password akun.</li>
+                          <li>Dilarang login di lebih dari 1 perangkat secara bersamaan.</li>
+                          <li>Gunakan hanya profil yang telah ditentukan untuk Anda.</li>
+                        </ol>
+                        <p>Selamat menikmati layanan Anda!</p>
+                        <hr style="border: 0; border-top: 1px solid #fee2e2; margin: 20px 0;" />
+                        <p style="font-size: 11px; color: #991b1b; text-align: center; margin-bottom: 0;">Email ini dikirim otomatis oleh LanggananYuk Support.</p>
+                      </div>
+                    `;
+
+                    const response = await fetch("/api/admin/send-email", {
+                      method: "POST",
+                      headers: {
+                        "Content-Type": "application/json",
+                        ...getAuthHeader()
+                      },
+                      body: JSON.stringify({
+                        to: selectedTrx.email,
+                        subject: `Kredensial Akun Premium ${svcName} Anda! 🎉`,
+                        html: htmlContent
+                      })
+                    });
+
+                    const data = await response.json();
+                    if (response.ok) {
+                      alert(`Kredensial berhasil dikirim via Resend Email ke ${selectedTrx.email}!`);
+                      setShowCredentialsModal(false);
+                    } else {
+                      alert(`Gagal mengirim Email: ${data.error}`);
+                    }
+                  } catch (err) {
+                    console.error("Error sending email:", err);
+                    alert("Gagal mengirim Email. Pastikan API key Resend aktif.");
+                  } finally {
+                    setIsSendingEmail(false);
+                  }
+                }}
+                disabled={isSendingEmail || !selectedTrx.email}
+                className="w-full bg-red-650 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200 text-white font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-red-650/10"
               >
-                Batalkan
+                {isSendingEmail ? "Mengirim..." : "Kirim via Resend Email"}
               </button>
+
               <button
                 onClick={async () => {
                   setIsSendingWa(true);
@@ -1226,10 +1294,16 @@ export default function AdminDashboard() {
                   }
                 }}
                 disabled={isSendingWa}
-                className="w-1/2 bg-red-600 hover:bg-red-700 disabled:bg-red-400 text-white border border-red-700 font-bold py-2.5 rounded-2xl text-xs shadow-lg shadow-red-600/10 cursor-pointer transition-all flex items-center justify-center gap-1.5"
+                className="w-full bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5"
               >
-                <Send size={14} />
-                {isSendingWa ? "Mengirim..." : "Kirim via Fonnte API"}
+                {isSendingWa ? "Mengirim..." : "Kirim via WhatsApp (Backup)"}
+              </button>
+
+              <button
+                onClick={() => setShowCredentialsModal(false)}
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-650 font-bold py-2 rounded-2xl text-[10px] cursor-pointer transition-all"
+              >
+                Batalkan
               </button>
             </div>
           </div>
