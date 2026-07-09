@@ -1,19 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { supabaseAdmin } from "@/lib/supabase-admin";
+import { isAuthorizedAdmin } from "@/lib/auth-admin";
 
 export const dynamic = "force-dynamic";
 
-// Authentication helper
-function checkAuth(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  if (!authHeader || authHeader !== "Bearer raihan9898") {
-    return false;
-  }
-  return true;
-}
-
+// GET: Retrieve credentials
 export async function GET(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -44,7 +37,7 @@ export async function GET(req: NextRequest) {
 
 // POST: Add new credential
 export async function POST(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
@@ -81,7 +74,7 @@ export async function POST(req: NextRequest) {
 
 // DELETE: Remove credential by ID
 export async function DELETE(req: NextRequest) {
-  if (!checkAuth(req)) {
+  if (!await isAuthorizedAdmin(req)) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
