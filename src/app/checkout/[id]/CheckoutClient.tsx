@@ -144,17 +144,22 @@ export default function CheckoutClient({ service }: { service: any }) {
 
   useEffect(() => {
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "";
-    const isSandbox = clientKey.startsWith("SB-");
-    const scriptUrl = isSandbox
-      ? "https://app.sandbox.midtrans.com/snap/snap.js"
-      : "https://app.midtrans.com/snap/snap.js";
+    // Jika clientKey kosong atau berawalan SB-, gunakan sandbox. Hanya gunakan production jika key diisi dan tidak diawali SB-.
+    const isProduction = !!clientKey && !clientKey.startsWith("SB-");
+    const scriptUrl = isProduction
+      ? "https://app.midtrans.com/snap/snap.js"
+      : "https://app.sandbox.midtrans.com/snap/snap.js";
+
+    console.log("Loading Midtrans Snap from:", scriptUrl, "Client Key:", clientKey ? "Present" : "Missing");
 
     const existingScript = document.getElementById("midtrans-snap");
     if (!existingScript) {
       const script = document.createElement("script");
       script.src = scriptUrl;
       script.id = "midtrans-snap";
-      script.setAttribute("data-client-key", clientKey);
+      if (clientKey) {
+        script.setAttribute("data-client-key", clientKey);
+      }
       document.body.appendChild(script);
     }
   }, []);
