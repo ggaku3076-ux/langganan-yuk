@@ -4,7 +4,6 @@ import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Send, Menu, X } from "lucide-react";
-import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 
 export default function Navbar() {
@@ -96,43 +95,39 @@ export default function Navbar() {
         </div>
 
         {/* Mobile Dropdown Menu (Fast rendering, solid red background to eliminate mobile GPU lag) */}
-        <AnimatePresence>
-          {isMenuOpen && (
-            <motion.div 
-              initial={{ opacity: 0, y: -6 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -6 }}
-              transition={{ duration: 0.12, ease: "easeOut" }}
-              className="md:hidden border-t border-red-500 bg-[#E21F1F] rounded-b-2xl"
+        <div 
+          className={`md:hidden border-t border-red-500 bg-[#E21F1F] rounded-b-2xl transition-all duration-200 ease-out origin-top ${
+            isMenuOpen 
+              ? "max-h-96 opacity-100 scale-y-100" 
+              : "max-h-0 opacity-0 scale-y-95 pointer-events-none overflow-hidden"
+          }`}
+        >
+          <div className="px-6 py-4 flex flex-col gap-3">
+            {links.map((link) => (
+              <Link 
+                key={link.path} 
+                href={link.path}
+                onClick={() => setIsMenuOpen(false)}
+                className={`font-bold text-sm py-2 transition-colors ${
+                  cleanPath === link.path.replace(/\/$/, "")
+                    ? "text-white pl-2 border-l-2 border-white"
+                    : "text-white/80 hover:text-white"
+                }`}
+              >
+                {link.name}
+              </Link>
+            ))}
+            <a 
+              href="https://wa.me/6285286502731"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setIsMenuOpen(false)}
+              className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-colors shadow-sm mt-2 bg-white text-[#E21F1F] hover:bg-red-50"
             >
-              <div className="px-6 py-4 flex flex-col gap-3">
-                {links.map((link) => (
-                  <Link 
-                    key={link.path} 
-                    href={link.path}
-                    onClick={() => setIsMenuOpen(false)}
-                    className={`font-bold text-sm py-2 transition-colors ${
-                      cleanPath === link.path.replace(/\/$/, "")
-                        ? "text-white pl-2 border-l-2 border-white"
-                        : "text-white/80 hover:text-white"
-                    }`}
-                  >
-                    {link.name}
-                  </Link>
-                ))}
-                <a 
-                  href="https://wa.me/6285286502731"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setIsMenuOpen(false)}
-                  className="flex items-center justify-center gap-2 w-full py-3 text-sm font-bold rounded-xl transition-colors shadow-sm mt-2 bg-white text-[#E21F1F] hover:bg-red-50"
-                >
-                  <Send size={14} /> Hubungi CS Online
-                </a>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
+              <Send size={14} /> Hubungi CS Online
+            </a>
+          </div>
+        </div>
 
       </header>
     </div>
