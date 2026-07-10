@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Send, Menu, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import Image from "next/image";
 
 export default function Navbar() {
   const pathname = usePathname();
@@ -42,9 +43,11 @@ export default function Navbar() {
             className="flex items-center gap-2 md:gap-2.5 cursor-pointer group"
             onClick={() => setIsMenuOpen(false)}
           >
-            <img 
-              src="/logo-emblem.png?v=3" 
+            <Image 
+              src="/logo-emblem.png" 
               alt="Layanan Yuk Emblem" 
+              width={40}
+              height={40}
               className="h-8 w-auto md:h-10 object-contain transition-transform group-hover:scale-105" 
             />
             <span className="font-extrabold text-base md:text-lg tracking-tight transition-colors text-white group-hover:text-white/90">

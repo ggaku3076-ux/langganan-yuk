@@ -1,6 +1,5 @@
-"use client";
-
 import Link from "next/link";
+import Image from "next/image";
 import { ShieldCheck, Zap, Users, ArrowRight, HelpCircle, CheckCircle2, Info } from "lucide-react";
 import { services, formatRupiah } from "@/data/services";
 
@@ -8,9 +7,20 @@ export default function Home() {
   return (
     <div className="w-full flex flex-col">
       {/* SECTION 1: HERO SECTION (Mobile Optimized Spacing & hardware accelerated fade) */}
-      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.png')] bg-[length:auto_55%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12">
+      <section className="w-full bg-[#E21F1F] min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12 overflow-hidden">
+        {/* Optimized Hero background image using Next.js Image with LCP priority */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <Image
+            src="/hero-bg.png"
+            alt="Hero Background"
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover md:object-contain object-right-bottom md:object-right opacity-30 md:opacity-100"
+          />
+        </div>
         {/* Dark overlay for better readability on small screens */}
-        <div className="absolute inset-0 bg-[#E21F1F]/10 md:bg-transparent pointer-events-none" />
+        <div className="absolute inset-0 bg-[#E21F1F]/10 md:bg-transparent pointer-events-none z-10" />
         
         <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <div className="max-w-2xl text-left flex flex-col items-start transition-opacity duration-500 ease-out">
@@ -60,10 +70,12 @@ export default function Home() {
                   className="group flex flex-col justify-between h-full bg-white rounded-2xl md:rounded-3xl border border-red-100 p-4 sm:p-6 md:p-8 text-center transition-all duration-300 md:hover:border-red-600 md:hover:shadow-xl md:hover:-translate-y-1"
                 >
                   <div>
-                    <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1">
-                      <img 
+                    <div className="h-14 sm:h-16 flex items-center justify-center mb-2 w-full p-1 relative">
+                      <Image 
                         src={service.logoUrl} 
                         alt={`Logo ${service.name}`} 
+                        width={64}
+                        height={64}
                         className="max-h-full max-w-full object-contain transition-transform duration-300 group-hover:scale-105"
                       />
                     </div>
@@ -74,7 +86,7 @@ export default function Home() {
                   </div>
                   
                   <div className="mt-auto pt-4 border-t border-red-50">
-                    <p className="text-[10px] sm:text-xs text-red-400 font-semibold line-through mb-0.5 sm:mb-1">
+                    <p className="text-[10px] sm:text-xs text-slate-500 font-semibold line-through mb-0.5 sm:mb-1">
                       {formatRupiah(service.originalPrice)}
                     </p>
                     <p className="text-lg sm:text-2xl font-bold text-red-600 mb-0.5">
@@ -155,7 +167,7 @@ export default function Home() {
                 </div>
                 <div>
                   <h3 className="text-sm sm:text-base font-bold text-red-950 mb-2">{article.title}</h3>
-                  <p className="text-red-900/80 font-medium text-xs leading-relaxed">{article.desc}</p>
+                  <p className="text-slate-650 font-medium text-xs leading-relaxed">{article.desc}</p>
                 </div>
               </div>
             ))}

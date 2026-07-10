@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { Mail, Phone, ShieldCheck, ArrowUpRight } from "lucide-react";
 
 export default function Footer() {
@@ -12,9 +13,11 @@ export default function Footer() {
           {/* Logo & Deskripsi */}
           <div className="md:col-span-5 flex flex-col items-start gap-4">
             <Link href="/" className="flex items-center gap-2 group">
-              <img 
-                src="/logo-emblem.png?v=3" 
+              <Image 
+                src="/logo-emblem.png" 
                 alt="LanggananYuk Emblem" 
+                width={32}
+                height={32}
                 className="h-8 w-auto object-contain transition-transform group-hover:scale-105" 
               />
               <span className="font-extrabold text-lg text-white tracking-tight">
