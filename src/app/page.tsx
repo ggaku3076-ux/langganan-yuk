@@ -7,20 +7,9 @@ export default function Home() {
   return (
     <div className="w-full flex flex-col">
       {/* SECTION 1: HERO SECTION (Mobile Optimized Spacing & hardware accelerated fade) */}
-      <section className="w-full bg-[#E21F1F] min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12 overflow-hidden">
-        {/* Optimized Hero background image using Next.js Image with LCP priority */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <Image
-            src="/hero-bg.webp"
-            alt="Hero Background"
-            fill
-            priority
-            sizes="100vw"
-            className="object-cover md:object-contain object-right-bottom md:object-right opacity-30 md:opacity-100"
-          />
-        </div>
+      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.webp')] bg-[length:auto_55%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12">
         {/* Dark overlay for better readability on small screens */}
-        <div className="absolute inset-0 bg-[#E21F1F]/10 md:bg-transparent pointer-events-none z-10" />
+        <div className="absolute inset-0 bg-[#E21F1F]/10 md:bg-transparent pointer-events-none" />
         
         <div className="max-w-6xl mx-auto px-6 w-full relative z-10">
           <div className="max-w-2xl text-left flex flex-col items-start transition-opacity duration-500 ease-out">
