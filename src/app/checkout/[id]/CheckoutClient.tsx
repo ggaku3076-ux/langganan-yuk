@@ -144,8 +144,7 @@ export default function CheckoutClient({ service }: { service: any }) {
 
   useEffect(() => {
     const clientKey = process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY || "";
-    // Jika clientKey kosong atau berawalan SB-, gunakan sandbox. Hanya gunakan production jika key diisi dan tidak diawali SB-.
-    const isProduction = !!clientKey && !clientKey.startsWith("SB-");
+    const isProduction = process.env.NEXT_PUBLIC_MIDTRANS_IS_PRODUCTION === "true";
     const scriptUrl = isProduction
       ? "https://app.midtrans.com/snap/snap.js"
       : "https://app.sandbox.midtrans.com/snap/snap.js";
