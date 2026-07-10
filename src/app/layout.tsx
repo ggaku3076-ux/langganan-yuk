@@ -21,11 +21,11 @@ export const metadata: Metadata = {
   icons: {
     icon: [
       { url: "/favicon.ico?v=3" },
-      { url: "/logo-emblem.png", sizes: "192x192", type: "image/png" }
+      { url: "/logo-emblem.webp", sizes: "192x192", type: "image/webp" }
     ],
     shortcut: "/favicon.ico?v=3",
     apple: [
-      { url: "/logo-emblem.png", sizes: "180x180", type: "image/png" }
+      { url: "/logo-emblem.webp", sizes: "180x180", type: "image/webp" }
     ]
   }
 };

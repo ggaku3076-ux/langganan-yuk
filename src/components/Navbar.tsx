@@ -44,7 +44,7 @@ export default function Navbar() {
             onClick={() => setIsMenuOpen(false)}
           >
             <Image 
-              src="/logo-emblem.png" 
+              src="/logo-emblem.webp" 
               alt="Layanan Yuk Emblem" 
               width={40}
               height={40}

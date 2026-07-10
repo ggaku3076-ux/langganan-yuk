@@ -14,7 +14,7 @@ export default function Footer() {
           <div className="md:col-span-5 flex flex-col items-start gap-4">
             <Link href="/" className="flex items-center gap-2 group">
               <Image 
-                src="/logo-emblem.png" 
+                src="/logo-emblem.webp" 
                 alt="LanggananYuk Emblem" 
                 width={32}
                 height={32}

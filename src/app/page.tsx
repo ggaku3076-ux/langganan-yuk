@@ -11,7 +11,7 @@ export default function Home() {
         {/* Optimized Hero background image using Next.js Image with LCP priority */}
         <div className="absolute inset-0 z-0 pointer-events-none">
           <Image
-            src="/hero-bg.png"
+            src="/hero-bg.webp"
             alt="Hero Background"
             fill
             priority
