@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { motion } from "framer-motion";
+
 import { CheckCircle2, AlertCircle, QrCode, ArrowLeft, Loader2, User, UserPlus, RefreshCw } from "lucide-react";
 import { formatRupiah } from "@/data/services";
 import Link from "next/link";
@@ -604,14 +604,12 @@ export default function CheckoutClient({ service }: { service: any }) {
       {appState === "waiting" && (
         <div className="max-w-xl mx-auto">
           <div className="bg-white p-8 sm:p-10 rounded-3xl border border-red-100 shadow-xl text-center">
-            <motion.div 
-              initial={{ scale: 0 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 300, damping: 20 }}
-              className="w-16 h-16 sm:w-20 sm:h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-md"
+            <div 
+              className="w-16 h-16 sm:w-20 sm:h-20 bg-red-600 rounded-full flex items-center justify-center mx-auto mb-6 sm:mb-8 shadow-md animate-[scaleIn_0.4s_ease-out_forwards]"
+              style={{ animationFillMode: 'both' }}
             >
               <CheckCircle2 size={28} className="text-white" strokeWidth={2.5} />
-            </motion.div>
+            </div>
             
             <h2 className="text-2xl sm:text-3xl font-bold mb-2 sm:mb-3 text-red-950 tracking-tight">Pembayaran Sukses!</h2>
             <p className="text-red-800 text-sm sm:text-base mb-6 sm:mb-8 font-semibold leading-relaxed">
@@ -626,14 +624,12 @@ export default function CheckoutClient({ service }: { service: any }) {
               </div>
               
               <div className="w-full bg-red-50 rounded-full h-3.5 overflow-hidden mb-5 sm:mb-6 border border-red-100 p-0.5">
-                <motion.div 
-                  initial={{ width: `${(selectedGroup ? selectedGroup.filled : service.filledSlots) / (selectedGroup ? selectedGroup.total : service.totalSlots) * 100}%` }}
-                  animate={{ width: `${((selectedGroup ? selectedGroup.filled : service.filledSlots) + 1) / (selectedGroup ? selectedGroup.total : service.totalSlots) * 100}%` }}
-                  transition={{ delay: 0.5, duration: 1.5, ease: "circOut" }}
-                  className="h-full bg-red-600 rounded-full relative overflow-hidden"
+                <div 
+                  className="h-full bg-red-600 rounded-full relative overflow-hidden transition-all duration-[1500ms] ease-out"
+                  style={{ width: `${((selectedGroup ? selectedGroup.filled : service.filledSlots) + 1) / (selectedGroup ? selectedGroup.total : service.totalSlots) * 100}%` }}
                 >
                   <div className="absolute top-0 left-0 w-full h-full bg-[linear-gradient(45deg,transparent_25%,rgba(255,255,255,0.2)_50%,transparent_75%)] bg-[length:20px_20px] animate-[shimmer_1s_infinite_linear]" />
-                </motion.div>
+                </div>
               </div>
               
               <div className="flex items-start gap-3 bg-red-50/50 p-4 rounded-xl border border-red-50">
