@@ -7,7 +7,7 @@ export default function Home() {
   return (
     <div className="w-full flex flex-col">
       {/* SECTION 1: HERO SECTION (Mobile Optimized Spacing & hardware accelerated fade) */}
-      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.webp')] bg-[length:auto_55%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12">
+      <section className="w-full bg-[#E21F1F] bg-[url('/hero-bg.png')] bg-[length:auto_55%] md:bg-contain bg-no-repeat bg-right-bottom md:bg-right min-h-[480px] md:min-h-[580px] flex items-center relative py-12 pt-28 pb-60 md:pt-36 md:pb-12">
         {/* Dark overlay for better readability on small screens */}
         <div className="absolute inset-0 bg-[#E21F1F]/10 md:bg-transparent pointer-events-none" />
         
