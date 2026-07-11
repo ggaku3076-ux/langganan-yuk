@@ -157,6 +157,9 @@ export default function AdminDashboard() {
   const [groupsLoading, setGroupsLoading] = useState(false);
   const [isSendingWa, setIsSendingWa] = useState(false);
   const [isSendingEmail, setIsSendingEmail] = useState(false);
+  const [showGroupCredsModal, setShowGroupCredsModal] = useState(false);
+  const [selectedGroupForCreds, setSelectedGroupForCreds] = useState<any | null>(null);
+  const [selectedGroupEmail, setSelectedGroupEmail] = useState<string>("");
 
   // Check session and validate email on mount & hide global layout components
   useEffect(() => {
@@ -438,16 +441,25 @@ export default function AdminDashboard() {
     const svc = services.find((s) => s.id === serviceId);
     if (!svc) return;
 
-    const slotInput = prompt(
-      `Masukkan jumlah slot maksimal untuk grup baru ${svc.name} (contoh: 3 atau 4):`,
-      String(svc.totalSlots)
-    );
-    if (slotInput === null) return;
-
-    const maxSlots = parseInt(slotInput);
-    if (isNaN(maxSlots) || maxSlots <= 0) {
-      alert("Jumlah slot harus berupa angka positif!");
-      return;
+    let maxSlots = svc.totalSlots;
+    if (svc.options && svc.options.length > 1) {
+      const optionsList = svc.options
+        .map((opt, index) => `${index + 1}. ${opt.label} (${opt.slots} User)`)
+        .join("\n");
+      const selection = prompt(
+        `Pilih tipe grup untuk ${svc.name}:\n${optionsList}\n\nMasukkan nomor pilihan (1-${svc.options.length}):`,
+        "1"
+      );
+      if (selection === null) return;
+      
+      const selectedIdx = parseInt(selection) - 1;
+      if (isNaN(selectedIdx) || selectedIdx < 0 || selectedIdx >= svc.options.length) {
+        alert("Pilihan tidak valid!");
+        return;
+      }
+      maxSlots = svc.options[selectedIdx].slots;
+    } else if (svc.options && svc.options.length === 1) {
+      maxSlots = svc.options[0].slots;
     }
 
     try {
@@ -461,7 +473,7 @@ export default function AdminDashboard() {
       });
       const data = await response.json();
       if (response.ok) {
-        alert("Grup baru berhasil dibuat!");
+        alert(`Grup baru (${maxSlots} User) berhasil dibuat!`);
         await fetchGroupsList();
       } else {
         alert(`Gagal membuat grup: ${data.error}`);
@@ -1041,8 +1053,23 @@ export default function AdminDashboard() {
                               </span>
                             )}
                             <button
+                              onClick={() => {
+                                setSelectedGroupForCreds(group);
+                                const serviceCreds = allCreds.filter(c => c.service_id === group.service_id && !c.is_used);
+                                const firstEmail = serviceCreds.length > 0 ? serviceCreds[0].email : "";
+                                setSelectedGroupEmail(firstEmail);
+                                setShowGroupCredsModal(true);
+                              }}
+                              disabled={trxs.filter((t: any) => t.status === "SUCCESS").length === 0}
+                              className="bg-red-600 hover:bg-red-750 disabled:opacity-30 text-white font-bold p-1.5 rounded-lg transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 text-[10px]"
+                              title="Kirim Akun ke Seluruh Anggota Grup yang Lunas"
+                            >
+                              <Send size={11} />
+                              Kirim Akun ke Grup
+                            </button>
+                            <button
                               onClick={() => handleDeleteGroup(group.id)}
-                              className="bg-white hover:bg-red-50 text-slate-400 hover:text-red-600 border border-slate-200 hover:border-red-250 font-bold p-1.5 rounded-lg transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 text-[10px]"
+                              className="bg-white hover:bg-red-50 text-slate-400 hover:text-red-650 border border-slate-200 hover:border-red-250 font-bold p-1.5 rounded-lg transition-all cursor-pointer shadow-sm flex items-center justify-center gap-1 text-[10px]"
                               title="Hapus Grup"
                             >
                               <Trash2 size={11} />
@@ -1473,6 +1500,221 @@ export default function AdminDashboard() {
 
               <button
                 onClick={() => setShowCredentialsModal(false)}
+                className="w-full bg-slate-100 hover:bg-slate-200 text-slate-650 font-bold py-2 rounded-2xl text-[10px] cursor-pointer transition-all"
+              >
+                Batalkan
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* GROUP CREDENTIALS DIALOG */}
+      {showGroupCredsModal && selectedGroupForCreds && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/60 backdrop-blur-sm">
+          <div className="w-full max-w-lg bg-white border border-red-100 rounded-3xl p-6 shadow-2xl relative max-h-[90vh] flex flex-col">
+            <h3 className="text-lg font-black text-red-950 mb-2">Kirim Akun ke Seluruh Grup</h3>
+            <p className="text-xs text-slate-500 mb-4">
+              Kirim kredensial layanan patungan **{services.find(s => s.id === selectedGroupForCreds.service_id)?.name}** ke seluruh anggota aktif di **{selectedGroupForCreds.id}**.
+            </p>
+
+            {/* Members preview */}
+            <div className="bg-slate-50 border border-slate-100 rounded-2xl p-4 mb-4 text-xs font-bold text-slate-700 space-y-2 shadow-inner max-h-[150px] overflow-y-auto">
+              <p className="text-[10px] uppercase tracking-wider text-slate-400 mb-1">Anggota Penerima Notifikasi (SUCCESS):</p>
+              {(() => {
+                const trxs = selectedGroupForCreds.transactions || [];
+                const activeMembers = trxs.filter((t: any) => t.status === "SUCCESS");
+                if (activeMembers.length === 0) {
+                  return <p className="text-red-600">Tidak ada anggota dengan status Lunas (SUCCESS) di grup ini.</p>;
+                }
+                return activeMembers.map((t: any) => (
+                  <div key={t.id} className="flex justify-between border-b border-slate-200/50 pb-1">
+                    <span>{t.buyer_name} ({t.whatsapp_number})</span>
+                    <span className="text-slate-400">Slot #{trxs.findIndex((tx: any) => tx.id === t.id) + 1}</span>
+                  </div>
+                ));
+              })()}
+            </div>
+
+            <div className="space-y-4 flex-1 overflow-y-auto pr-1">
+              <div>
+                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Pilih Akun Shared (Dari Stok)</label>
+                {(() => {
+                  const serviceCreds = allCreds.filter(c => c.service_id === selectedGroupForCreds.service_id && !c.is_used);
+                  const uniqueEmails = Array.from(new Set(serviceCreds.map(c => c.email)));
+                  if (uniqueEmails.length === 0) {
+                    return (
+                      <div className="p-3.5 bg-red-50 border border-red-200 text-red-700 text-xs rounded-2xl font-bold flex items-center gap-1.5 animate-pulse">
+                        ⚠️ Stok akun habis! Silakan tambah stok terlebih dahulu di tab produk.
+                      </div>
+                    );
+                  }
+                  return (
+                    <select
+                      value={selectedGroupEmail}
+                      onChange={(e) => setSelectedGroupEmail(e.target.value)}
+                      className="w-full bg-slate-50 border border-slate-200 p-3 rounded-2xl font-bold text-xs focus:outline-none focus:border-red-600 text-slate-800"
+                    >
+                      {uniqueEmails.map((email: string) => (
+                        <option key={email} value={email}>
+                          {email}
+                        </option>
+                      ))}
+                    </select>
+                  );
+                })()}
+              </div>
+
+              {/* Preview Message template */}
+              <div>
+                <label className="block text-[10px] uppercase font-black tracking-wider text-slate-500 mb-2">Pratinjau Format Pesan (Sesuai Slot)</label>
+                <textarea
+                  readOnly
+                  rows={6}
+                  value={(() => {
+                    const activeCred = allCreds.find(c => c.email === selectedGroupEmail && c.service_id === selectedGroupForCreds.service_id);
+                    if (!activeCred) return "Silakan pilih stok akun terlebih dahulu.";
+                    const svcName = services.find(s => s.id === selectedGroupForCreds.service_id)?.name || selectedGroupForCreds.service_id;
+                    return `Halo [Nama Anggota],\n\nPembayaran Anda untuk patungan ${svcName} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: ${selectedGroupEmail}\n- Password: ${activeCred.password}\n- Profil Penggunaan: Profil [Slot #] / User [Slot #]\n- PIN Profil: [PIN Slot]\n\n⚠️ PENTING: PIN profil dapat Anda ubah/atur melalui pengaturan profil masing-masing. Jika mendeteksi ada pihak lain/perangkat mencurigakan yang login ke profil Anda, segera lapor ke kami.\n\nMohon dilarang mengubah password/kredensial utama akun agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`;
+                  })()}
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-700 text-xs rounded-2xl p-4 focus:outline-none font-bold leading-relaxed shadow-inner"
+                />
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-2 mt-6">
+              <button
+                onClick={async () => {
+                  const trxs = selectedGroupForCreds.transactions || [];
+                  const activeMembers = trxs.filter((t: any) => t.status === "SUCCESS");
+                  if (activeMembers.length === 0) {
+                    alert("Tidak ada anggota Lunas (SUCCESS) di grup ini untuk dikirimkan kredensial!");
+                    return;
+                  }
+                  if (!selectedGroupEmail) {
+                    alert("Silakan pilih stok akun terlebih dahulu!");
+                    return;
+                  }
+
+                  // Check if credentials exist for the selected email
+                  const emailCreds = allCreds.filter(c => c.email === selectedGroupEmail && c.service_id === selectedGroupForCreds.service_id);
+                  if (emailCreds.length === 0) {
+                    alert("Kredensial untuk akun ini tidak ditemukan!");
+                    return;
+                  }
+
+                  setIsSendingWa(true);
+                  setIsSendingEmail(true);
+
+                  try {
+                    const svcName = services.find(s => s.id === selectedGroupForCreds.service_id)?.name || selectedGroupForCreds.service_id;
+                    
+                    let successCount = 0;
+
+                    for (let idx = 0; idx < selectedGroupForCreds.max_slots; idx++) {
+                      // Find if there is a transaction at this slot (match by checking the position in the transaction array, or sorting)
+                      const tx = trxs[idx];
+                      if (tx && tx.status === "SUCCESS") {
+                        // Find credential matching the profile number (idx + 1)
+                        const cred = emailCreds.find(c => c.profile_number === (idx + 1)) || emailCreds[0];
+                        const password = cred.password;
+                        const profileNumber = idx + 1;
+                        const profilePin = cred.profile_pin || "Tanpa PIN";
+
+                        const msgText = `Halo ${tx.buyer_name},\n\nPembayaran Anda untuk patungan ${svcName} telah diverifikasi sukses! 🎉\n\nBerikut detail akun premium Anda:\n- Email: ${selectedGroupEmail}\n- Password: ${password}\n- Profil Penggunaan: Profil ${profileNumber} / User ${profileNumber}\n- PIN Profil: ${profilePin}\n\n⚠️ PENTING: PIN profil dapat Anda ubah/atur melalui pengaturan profil masing-masing. Jika mendeteksi ada pihak lain/perangkat mencurigakan yang login ke profil Anda, segera lapor ke kami.\n\nMohon dilarang mengubah password/kredensial utama akun agar masa garansi Anda tetap aktif.\n\nTerima kasih,\nLanggananYuk Support`;
+
+                        // Send WhatsApp
+                        await fetch("/api/admin/send-wa", {
+                          method: "POST",
+                          headers: {
+                            "Content-Type": "application/json",
+                            ...getAuthHeader()
+                          },
+                          body: JSON.stringify({
+                            target: tx.whatsapp_number,
+                            message: msgText
+                          })
+                        });
+
+                        // Send Email (if email exists)
+                        if (tx.buyer_email) {
+                          const htmlContent = `
+                            <div style="font-family: sans-serif; max-width: 600px; margin: auto; padding: 20px; border: 1px solid #fee2e2; border-radius: 20px;">
+                              <h2 style="color: #991b1b; margin-top: 0;">Halo ${tx.buyer_name},</h2>
+                              <p>Kabar baik! Kredensial akun premium <strong>${svcName}</strong> Anda telah aktif. 🚀</p>
+                              <div style="background-color: #fef2f2; padding: 15px; border-radius: 12px; margin: 20px 0; border: 1px solid #fee2e2;">
+                                <h3 style="margin-top: 0; color: #991b1b; font-size: 16px;">Detail Akun Premium Anda:</h3>
+                                <ul style="list-style: none; padding-left: 0; margin-bottom: 0; line-height: 1.6;">
+                                  <li><strong>Email Akun:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${selectedGroupEmail}</code></li>
+                                  <li><strong>Password:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${password}</code></li>
+                                  <li><strong>Profil:</strong> Profil ${profileNumber} / User ${profileNumber}</li>
+                                  <li><strong>PIN Profil:</strong> <code style="background-color: #ffe4e6; padding: 2px 6px; border-radius: 4px; font-family: monospace;">${profilePin}</code></li>
+                                </ul>
+                              </div>
+                              <h4 style="color: #991b1b; margin-bottom: 5px;">⚠️ Peringatan Penting:</h4>
+                              <ul style="margin-top: 0; padding-left: 20px; line-height: 1.6;">
+                                <li>PIN profil dapat Anda ubah/atur melalui pengaturan profil masing-masing.</li>
+                                <li>Jika mendeteksi ada pihak lain/perangkat mencurigakan yang login ke profil Anda, segera lapor ke kami.</li>
+                                <li>Dilarang mengubah email/password utama akun agar masa garansi tetap aktif.</li>
+                                <li>Gunakan hanya profil yang telah ditentukan untuk Anda.</li>
+                              </ul>
+                              <p>Selamat menikmati layanan Anda!</p>
+                              <hr style="border: 0; border-top: 1px solid #fee2e2; margin: 20px 0;" />
+                              <p style="font-size: 11px; color: #991b1b; text-align: center; margin-bottom: 0;">Email ini dikirim otomatis oleh LanggananYuk Support.</p>
+                            </div>
+                          `;
+
+                          await fetch("/api/admin/send-email", {
+                            method: "POST",
+                            headers: {
+                              "Content-Type": "application/json",
+                              ...getAuthHeader()
+                            },
+                            body: JSON.stringify({
+                              to: tx.buyer_email,
+                              subject: `Kredensial Akun Premium ${svcName} Anda! 🎉`,
+                              html: htmlContent
+                            })
+                          });
+                        }
+
+                        // Mark this credential profile row as used in DB
+                        await fetch("/api/admin/credentials", {
+                          method: "PUT",
+                          headers: {
+                            "Content-Type": "application/json",
+                            ...getAuthHeader()
+                          },
+                          body: JSON.stringify({
+                            id: cred.id,
+                            isUsed: true
+                          })
+                        });
+
+                        successCount++;
+                      }
+                    }
+
+                    alert(`Berhasil mengirim kredensial grup! Notifikasi dikirim ke ${successCount} anggota lunas.`);
+                    await fetchAllCredentials();
+                    await fetchGroupsList();
+                    setShowGroupCredsModal(false);
+                  } catch (err) {
+                    console.error("Error sending group credentials:", err);
+                    alert("Terjadi kesalahan jaringan saat mengirim kredensial grup.");
+                  } finally {
+                    setIsSendingWa(false);
+                    setIsSendingEmail(false);
+                  }
+                }}
+                disabled={isSendingWa || isSendingEmail || !selectedGroupEmail}
+                className="w-full bg-red-650 hover:bg-red-700 disabled:bg-slate-200 disabled:text-slate-400 disabled:border-slate-200 text-white font-bold py-2.5 rounded-2xl text-xs cursor-pointer transition-all flex items-center justify-center gap-1.5 shadow-lg shadow-red-655/10"
+              >
+                {isSendingWa || isSendingEmail ? "Mengirim..." : "Kirim Akun ke Seluruh Grup"}
+              </button>
+
+              <button
+                onClick={() => setShowGroupCredsModal(false)}
                 className="w-full bg-slate-100 hover:bg-slate-200 text-slate-650 font-bold py-2 rounded-2xl text-[10px] cursor-pointer transition-all"
               >
                 Batalkan
