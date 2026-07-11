@@ -42,13 +42,13 @@ export const services: Service[] = [
     name: "YouTube Premium",
     category: "Entertainment",
     logoUrl: "/logos/youtube.svg",
-    originalPrice: 99000,
-    sharedPrice: 20000,
+    originalPrice: 139000,
+    sharedPrice: 31500,
     totalSlots: 5,
     filledSlots: 2,
     description: "Nikmati jutaan video dan musik tanpa gangguan iklan, bisa diputar di latar belakang (background play), serta simpan video untuk ditonton offline.",
     options: [
-      { id: "family-slot", label: "1 Bulan", price: 20000, slots: 5, isDefault: true }
+      { id: "family-slot", label: "1 Bulan", price: 31500, slots: 5, isDefault: true }
     ]
   },
   {
@@ -99,16 +99,16 @@ export const services: Service[] = [
   },
   {
     id: "canva",
-    name: "Canva Pro",
+    name: "Canva Bisnis",
     category: "Design",
     logoUrl: "/logos/canva.svg",
-    originalPrice: 124000,
-    sharedPrice: 15000,
+    originalPrice: 130000,
+    sharedPrice: 30000,
     totalSlots: 5,
     filledSlots: 4,
-    description: "Akses jutaan template premium, foto stock, font kustom, serta tool hapus latar belakang otomatis untuk kebutuhan desain grafis instan.",
+    description: "Semua ada di Pro, termasuk Penghapus Latar Belakang, Ubah Ukuran Cepat, dan template premium. Penggunaan AI 20x lebih banyak daripada Canva Gratis di berbagai alat kami. Kembangkan merek Anda dengan hingga 100 Kit Merek dan berkolaborasilah dengan seluruh tim. Nikmati diskon 10% untuk semua pesanan cetak. Lengkap: buka akses ke fitur premium Leonardo.Ai dan Flourish (keduanya hanya tersedia dalam bahasa Inggris saat ini). Personalisasikan cara berbagi desain Canva Anda dengan menggunakan 100 tautan pendek khusus.",
     options: [
-      { id: "team-slot", label: "1 Bulan", price: 15000, slots: 5, isDefault: true }
+      { id: "team-slot", label: "1 Bulan", price: 30000, slots: 5, isDefault: true }
     ]
   },
   {
@@ -116,13 +116,14 @@ export const services: Service[] = [
     name: "Disney+ Hotstar",
     category: "Entertainment",
     logoUrl: "/logos/disney.svg",
-    originalPrice: 119000,
-    sharedPrice: 35000,
+    originalPrice: 120000,
+    sharedPrice: 45000,
     totalSlots: 3,
     filledSlots: 1,
-    description: "Streaming film-film box office Hollywood, Marvel, Disney, Pixar, Star Wars, serta konten eksklusif lokal berkualitas tertinggi Full HD.",
+    description: "Premium Plan: Akses hingga ke 3 perangkat secara bersamaan dengan kualitas video hingga 4K Ultra HD, tersedia di TV yang kompatibel.",
     options: [
-      { id: "shared-slot", label: "Premium Slot", price: 35000, slots: 3, isDefault: true }
+      { id: "3-user", label: "3 User", price: 45000, slots: 3, isDefault: true },
+      { id: "4-user", label: "4 User", price: 35000, slots: 4 }
     ]
   },
   {
@@ -131,12 +132,12 @@ export const services: Service[] = [
     category: "Entertainment",
     logoUrl: "/logos/prime.svg",
     originalPrice: 59000,
-    sharedPrice: 20000,
+    sharedPrice: 23167,
     totalSlots: 3,
     filledSlots: 1,
     description: "Streaming Amazon Originals populer seperti The Boys, Lord of the Rings, Reacher, serta ribuan film hollywood dengan subtitle Indonesia.",
     options: [
-      { id: "shared-slot", label: "1 Bulan", price: 20000, slots: 3, isDefault: true }
+      { id: "shared-slot", label: "1 Bulan", price: 23167, slots: 3, isDefault: true }
     ]
   },
   {
@@ -144,13 +145,13 @@ export const services: Service[] = [
     name: "Microsoft 365",
     category: "Productivity",
     logoUrl: "/logos/m365.svg",
-    originalPrice: 129000,
-    sharedPrice: 35000,
+    originalPrice: 139000,
+    sharedPrice: 31300,
     totalSlots: 5,
     filledSlots: 2,
     description: "Akses premium aplikasi Word, Excel, PowerPoint, Outlook, serta penyimpanan cloud OneDrive sebesar 1 TB (1000 GB) per pengguna.",
     options: [
-      { id: "family-member", label: "1 Bulan", price: 35000, slots: 5, isDefault: true }
+      { id: "family-member", label: "1 Bulan", price: 31300, slots: 5, isDefault: true }
     ]
   },
   {
@@ -159,12 +160,12 @@ export const services: Service[] = [
     category: "Design",
     logoUrl: "/logos/midjourney.svg",
     originalPrice: 480000,
-    sharedPrice: 120000,
+    sharedPrice: 123500,
     totalSlots: 4,
     filledSlots: 1,
     description: "Model generator gambar berbasis AI terpopuler dengan detail tinggi. Paket ini memberikan akses cepat pembuatan gambar kualitas super.",
     options: [
-      { id: "shared-fast", label: "Basic Shared", price: 120000, slots: 4, isDefault: true }
+      { id: "shared-fast", label: "Basic Shared", price: 123500, slots: 4, isDefault: true }
     ]
   },
   {
@@ -173,12 +174,12 @@ export const services: Service[] = [
     category: "Education",
     logoUrl: "/logos/duolingo.svg",
     originalPrice: 149000,
-    sharedPrice: 30000,
+    sharedPrice: 33300,
     totalSlots: 5,
     filledSlots: 3,
     description: "Belajar bahasa asing tanpa batas nyawa (Unlimited Hearts), bebas iklan, review kesalahan, serta kuis perkembangan bulanan gratis.",
     options: [
-      { id: "family-slot", label: "1 Bulan", price: 30000, slots: 5, isDefault: true }
+      { id: "family-slot", label: "1 Bulan", price: 33300, slots: 5, isDefault: true }
     ]
   },
   {
@@ -187,12 +188,12 @@ export const services: Service[] = [
     category: "Productivity",
     logoUrl: "/logos/notion.svg",
     originalPrice: 160000,
-    sharedPrice: 40000,
+    sharedPrice: 35500,
     totalSlots: 5,
     filledSlots: 1,
     description: "Workspace kolaborasi serbaguna tanpa batas file upload, riwayat revisi dokumen 30 hari, serta Notion AI pembantu penulisan draft.",
     options: [
-      { id: "member-slot", label: "1 Bulan", price: 40000, slots: 5, isDefault: true }
+      { id: "member-slot", label: "1 Bulan", price: 35500, slots: 5, isDefault: true }
     ]
   },
   {
@@ -201,12 +202,12 @@ export const services: Service[] = [
     category: "Productivity",
     logoUrl: "/logos/grammarly.svg",
     originalPrice: 450000,
-    sharedPrice: 90000,
+    sharedPrice: 93500,
     totalSlots: 5,
     filledSlots: 2,
     description: "Koreksi struktur tulisan bahasa Inggris tingkat lanjut, pengubah nada kalimat, deteksi plagiarisme, serta rekomendasi kosakata.",
     options: [
-      { id: "shared-slot", label: "1 Bulan", price: 90000, slots: 5, isDefault: true }
+      { id: "shared-slot", label: "1 Bulan", price: 93500, slots: 5, isDefault: true }
     ]
   },
   {
@@ -215,12 +216,12 @@ export const services: Service[] = [
     category: "Entertainment",
     logoUrl: "/logos/hbogo.svg",
     originalPrice: 79000,
-    sharedPrice: 25000,
+    sharedPrice: 29833,
     totalSlots: 3,
     filledSlots: 1,
     description: "Streaming film blockbusters terbaik, serial original HBO peraih penghargaan (Game of Thrones, House of the Dragon), serta Warner Bros.",
     options: [
-      { id: "shared-slot", label: "1 Bulan", price: 25000, slots: 3, isDefault: true }
+      { id: "shared-slot", label: "1 Bulan", price: 29833, slots: 3, isDefault: true }
     ]
   },
   {
@@ -229,12 +230,12 @@ export const services: Service[] = [
     category: "Entertainment",
     logoUrl: "/logos/appletv.svg",
     originalPrice: 99000,
-    sharedPrice: 30000,
+    sharedPrice: 36500,
     totalSlots: 3,
     filledSlots: 1,
     description: "Streaming konten eksklusif Apple Originals pemenang penghargaan (Ted Lasso, Severance, Morning Show) kualitas 4K HDR Atmos.",
     options: [
-      { id: "shared-slot", label: "1 Bulan", price: 30000, slots: 3, isDefault: true }
+      { id: "shared-slot", label: "1 Bulan", price: 36500, slots: 3, isDefault: true }
     ]
   }
 ];
